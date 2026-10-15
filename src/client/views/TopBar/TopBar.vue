@@ -41,20 +41,24 @@ const emit = defineEmits<{
       <Icon name="panel-left" :size="18" />
     </button>
     <div class="brand">
-      <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-      >
-        <rect x="3" y="3" width="18" height="18" rx="3" />
-        <path d="M7 15V9l2.5 3L12 9v6" />
-        <path d="M15 9v6l2-2M17 13l2 2" />
+      <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" rx="15" fill="currentColor" />
+        <rect x="13" y="16" width="28" height="4.5" rx="2.25" fill="var(--surface)" />
+        <rect x="13" y="27.5" width="22" height="4.5" rx="2.25" fill="var(--surface)" />
+        <rect x="13" y="34.5" width="22" height="2.5" rx="1.25" fill="#cdbf9a" />
+        <rect
+          x="13"
+          y="43.5"
+          width="25"
+          height="4.5"
+          rx="2.25"
+          fill="var(--surface)"
+          opacity="0.5"
+        />
+        <path
+          d="M43 24.5h9a3 3 0 0 1 3 3v6.5a3 3 0 0 1-3 3h-4.5l-3.5 3.25V37h-1a3 3 0 0 1-3-3v-6.5a3 3 0 0 1 3-3z"
+          fill="#cdbf9a"
+        />
       </svg>
       mdifit
     </div>

@@ -79,6 +79,8 @@ npm run check               # lint, format, typecheck, tests
 npm run build
 ```
 
+The landing page lives in `site/` (static, deployed to GitHub Pages by `.github/workflows/pages.yml`).
+
 How it is built: [ARCHITECTURE.md](ARCHITECTURE.md). Conventions: [AGENTS.md](AGENTS.md).
 Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

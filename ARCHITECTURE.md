@@ -54,6 +54,17 @@ drives the Hono app with `app.request()`.
 Vue 3 without a router or a state library: the shell (`App.vue`) owns the state and the
 hash is the route (`#/plans/a.md#scope`, `#/plans/a.md#L12`, `#/plans/a.md#comment-<id>`).
 
+### Folders
+
+A path ending in `/` is a folder (`#/plans/`; the root is `#/`). A folder opens with its
+entry file, `README.md` › `AGENTS.md` › `index.md` (`views/Folder/Folder.helpers.ts`), shown
+in the reader under a folded strip that lists the folder's contents and switches between
+entries when there is more than one. Without an entry file the folder page is the listing.
+Comments always attach to the file, never to the folder route. A route that points nowhere
+falls back to the nearest folder that exists. The top bar shows a breadcrumb relative to the
+workspace root (`docs › plans › README.md`); its copy button copies the path as prompts write
+it (relative to where the CLI started).
+
 ### From Markdown to commentable blocks
 
 `utils/markdown.ts` configures markdown-it (raw HTML off, linkify on, highlight.js for

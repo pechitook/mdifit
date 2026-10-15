@@ -18,3 +18,5 @@ All notable changes to this project are documented here. The format follows
 - ⌘K search across files, headings and text.
 - Reading progress per file, with "edited" when a file changes after it was read.
 - Live reload when files change on disk.
+- Folder pages: a folder opens with its `README.md` / `AGENTS.md` / `index.md` under a
+  foldable file list, or shows the list when it has none. Clickable breadcrumb.

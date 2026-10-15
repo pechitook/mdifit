@@ -44,6 +44,8 @@ same way into Claude Code, Codex, opencode or any chat.
 - **Reading progress**: mark files read (<kbd>R</kbd>); a file changed after you read it
   shows as *edited* and counts as unread again.
 - **Live reload**: when an agent edits a file, the page updates.
+- **Focus**: hide the files panel (<kbd>B</kbd>) or the comments panel (<kbd>N</kbd>);
+  the layout is remembered.
 
 Press <kbd>?</kbd> in the app for every shortcut.
 

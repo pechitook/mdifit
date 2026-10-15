@@ -22,3 +22,5 @@ All notable changes to this project are documented here. The format follows
   foldable file list, or shows the list when it has none. Clickable breadcrumb.
 - Mermaid diagrams, loaded on demand, following the light/dark theme, with a Diagram / Code
   switch, a full-size view and comments on node labels.
+- Buttons and shortcuts (B, N) to show or hide the files and comments panels, remembered
+  across sessions.

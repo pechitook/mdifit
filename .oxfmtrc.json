@@ -3,5 +3,5 @@
   "singleQuote": true,
   "printWidth": 100,
   "trailingComma": "all",
-  "ignorePatterns": ["dist", "fixtures", "*.md"]
+  "ignorePatterns": ["dist", "fixtures", "*.md", "site"]
 }

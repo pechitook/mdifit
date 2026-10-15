@@ -1,3 +1,5 @@
+import { snapEnd, snapStart } from './textRange.ts'
+
 /** Browser-only helpers: selection, clipboard, focus. Kept small; the rules live in pure modules. */
 
 export interface SelectionRange {
@@ -5,20 +7,28 @@ export interface SelectionRange {
   endLine: number
   quote: string
   rect: DOMRect
+  /** The selection, snapped to whole words. */
+  range: Range
 }
 
 /**
- * The current selection inside `container`, mapped to the source lines of the
- * elements it starts and ends in. Only text marked `data-doc` counts, so
- * selecting inside a comment card does nothing.
+ * The current selection inside `container`, snapped to whole words and mapped
+ * to the source lines of the elements it starts and ends in. Only text marked
+ * `data-doc` counts, so selecting inside a comment or a popover does nothing.
  */
 export function readSelection(container: HTMLElement): SelectionRange | null {
   const selection = window.getSelection()
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) return null
-  const range = selection.getRangeAt(0)
+  const range = selection.getRangeAt(0).cloneRange()
   if (!container.contains(range.commonAncestorContainer)) return null
 
-  const quote = selection.toString().trim()
+  snapToWords(range)
+  if (range.collapsed) return null
+  // Show the snapped selection, so what is highlighted is what gets quoted.
+  selection.removeAllRanges()
+  selection.addRange(range)
+
+  const quote = range.toString().trim()
   const start = lineElement(range.startContainer, container)
   const end = lineElement(range.endContainer, container)
   if (!quote || !start || !end) return null
@@ -32,6 +42,20 @@ export function readSelection(container: HTMLElement): SelectionRange | null {
     endLine: Math.max(...lines),
     quote,
     rect: range.getBoundingClientRect(),
+    range: range.cloneRange(),
+  }
+}
+
+function snapToWords(range: Range): void {
+  const { startContainer, endContainer } = range
+  if (startContainer instanceof Text) {
+    range.setStart(startContainer, snapStart(startContainer.data, range.startOffset))
+  }
+  if (endContainer instanceof Text) {
+    const end = snapEnd(endContainer.data, range.endOffset)
+    if (endContainer !== range.startContainer || end >= range.startOffset) {
+      range.setEnd(endContainer, end)
+    }
   }
 }
 

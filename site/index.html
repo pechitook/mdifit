@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>mdifit — review the Markdown your agents write</title>
+<meta name="description" content="Open a folder of Markdown in a calm reader, comment on any phrase as you read, and copy every note as one prompt for your coding agent. npx mdifit.">
+<meta property="og:title" content="mdifit — review the Markdown your agents write">
+<meta property="og:description" content="Comment on plans, specs and docs as you read, then copy every note as one prompt for your coding agent.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FBFAF7;-webkit-font-smoothing:antialiased}
+.copy[data-done]{background:#2F7D4F}
+a{color:#1E2023}a:hover{color:#5A5E66}
+.wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.eyebrow{font:500 13px 'IBM Plex Mono',monospace;letter-spacing:.02em;color:#6B5E3A}
+.mark{text-decoration:underline;text-decoration-color:#CDBF9A;text-decoration-thickness:.09em;text-underline-offset:.16em}
+.cmd{display:inline-flex;align-items:center;gap:14px;min-height:52px;padding:0 8px 0 18px;border:1px solid #E2DED5;border-radius:12px;background:#FFFFFF;font:500 16px 'IBM Plex Mono',monospace;color:#1E2023;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.cmd .dollar{color:#9A8B62}
+.copy{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:0 12px;border:0;border-radius:8px;background:#1E2023;color:#FFFFFF;font:600 13px 'IBM Plex Sans',sans-serif;cursor:pointer}
+.ghost-link{display:inline-flex;align-items:center;gap:8px;min-height:52px;padding:0 18px;border-radius:12px;font:500 15px 'IBM Plex Sans',sans-serif;text-decoration:none;color:#1E2023}
+.ghost-link:hover{background:#F1EFE9}
+.section{padding:120px 0 0}
+.h2{margin:0 0 16px;font:700 40px/1.15 'IBM Plex Sans',sans-serif;letter-spacing:-.02em;color:#1E2023}
+.lead{margin:0;max-width:620px;font-size:19px;line-height:1.6;color:#5A5E66}
+.card{flex:1 1 300px;min-width:0;padding:28px;border:1px solid #E7E4DD;border-radius:16px;background:#FFFFFF;box-sizing:border-box}
+.feat{flex:1 1 240px;min-width:0;padding:24px 4px 0;border-top:1px solid #E7E4DD}
+.feat h3{margin:0 0 8px;font-size:17px;line-height:1.35}
+.feat p{margin:0;font-size:15px;line-height:1.6;color:#5A5E66}
+.ico{display:flex;align-items:center;justify-content:center;width:36px;height:36px;margin-bottom:16px;border:1px solid #E7E4DD;border-radius:10px;background:#FFFFFF;color:#1E2023}
+code{font-family:'IBM Plex Mono',monospace}
+.kbd{display:inline-block;min-width:20px;padding:0 6px;border:1px solid #DDD9D0;border-radius:5px;background:#FFFFFF;font:500 13px/22px 'IBM Plex Mono',monospace;text-align:center;color:#3A3D42}
+.bubble{position:absolute;display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid #E2DED5;border-radius:15px;background:#FFFFFF;color:#6B6F76}
+.bubble.on{border-color:#1E2023;background:#1E2023;color:#FFFFFF}
+.pop{position:absolute;width:250px;padding:12px 14px;border:1px solid #E2DED5;border-radius:12px;background:#FFFFFF;box-shadow:0 12px 32px rgba(20,20,20,.10);font:15px/1.5 'IBM Plex Sans',sans-serif;color:#1E2023;text-align:left}
+.pop small{display:block;margin-bottom:4px;font-size:12px;color:#6B6F76}
+@media (max-width:1280px){.hero-pop{display:none}}
+@media (max-width:980px){.hero-note{display:none}}
+@media (max-width:640px){.nav-extra{display:none}.h2{font-size:30px}.cmd{font-size:14px}.section{padding-top:80px}}
+</style>
+</head>
+<body>
+<div style="overflow-x: clip; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #1E2023; background: #FBFAF7">
+
+  <header class="wrap" style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding-top: 22px; padding-bottom: 22px">
+    <a href="./" style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; letter-spacing: -0.01em; text-decoration: none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M7 15V9l2.5 3L12 9v6"></path><path d="M15 9v6l2-2M17 13l2 2"></path></svg>
+      mdifit
+    </a>
+    <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px; margin-left: auto; font-size: 15px">
+      <a href="#how" class="ghost-link nav-extra" style="min-height: 40px">How it works</a>
+      <a href="#features" class="ghost-link nav-extra" style="min-height: 40px">Features</a>
+      <a href="https://github.com/pechitook/mdifit" class="ghost-link" style="min-height: 40px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"></path></svg>
+        GitHub
+      </a>
+    </nav>
+  </header>
+
+  <section class="wrap" style="padding-top: 72px; text-align: center">
+    <p class="eyebrow" style="margin: 0 0 24px">Open source · MIT · runs locally with npx</p>
+    <div style="position: relative; display: inline-block; max-width: 900px">
+      <h1 style="margin: 0; font-size: clamp(44px, 7vw, 84px); line-height: 1.04; letter-spacing: -0.035em; font-weight: 700">
+        Review the Markdown <span class="mark">your agents write</span>.
+      </h1>
+      <span class="hero-note bubble on" style="right: -64px; top: 104px" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      </span>
+      <span class="hero-note hero-pop pop" style="right: -150px; top: 148px; width: 220px" aria-hidden="true"><small>Line 1 · just now</small>Plans, specs, reports. Read them before they ship.</span>
+    </div>
+    <p class="lead" style="margin: 28px auto 0; max-width: 560px">mdifit opens a folder of Markdown in a calm reader. Comment on any phrase as you read, suggest edits in place, then copy every note as one prompt for your coding agent.</p>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 36px">
+      <div class="cmd"><span><span class="dollar">$</span> npx mdifit docs/</span><button type="button" class="copy" data-copy="npx mdifit docs/">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 9h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2z"></path><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>Copy</button></div>
+      <a href="https://github.com/pechitook/mdifit" class="ghost-link">View on GitHub <span aria-hidden="true">→</span></a>
+    </div>
+    <p style="margin: 14px 0 0; font-size: 14px; color: #6B6F76">Node 24+. Nothing to install, nothing written to your folder.</p>
+  </section>
+
+  <section class="wrap" style="padding-top: 72px" aria-label="Product preview">
+    <div style="border: 1px solid #E2DED5; border-radius: 18px; background: #FFFFFF; box-shadow: 0 30px 80px rgba(60,50,20,0.10); overflow: hidden">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid #EEECE7; font-size: 14px; color: #6B6F76">
+        <span style="display: flex; gap: 6px" aria-hidden="true"><span style="width: 11px; height: 11px; border-radius: 6px; background: #E6E3DC"></span><span style="width: 11px; height: 11px; border-radius: 6px; background: #E6E3DC"></span><span style="width: 11px; height: 11px; border-radius: 6px; background: #E6E3DC"></span></span>
+        <span style="margin-left: 8px">docs › architecture › <strong style="color: #1E2023">queue-migration.md</strong></span>
+        <span style="margin-left: auto; display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: #F3F2EE; font-size: 13px"><span style="padding: 3px 10px; border-radius: 6px; background: #FFFFFF; color: #1E2023">Read</span><span style="padding: 3px 10px">Source</span></span>
+        <span style="padding: 6px 12px; border: 1px solid #E4E1DA; border-radius: 8px; color: #1E2023; font-size: 13px">Copy prompt · 2</span>
+      </div>
+      <div style="position: relative; max-width: 620px; margin: 0 auto 0 max(24px, 9%); padding: 56px 24px 64px; box-sizing: border-box; font-size: 18px; line-height: 1.75; text-align: left">
+        <h2 style="margin: 0 0 20px; font-size: 32px; line-height: 1.2; letter-spacing: -0.02em">Move order processing to a queue</h2>
+        <p style="margin: 0 0 20px">Orders are written to Postgres and published through an outbox in the same transaction. Workers consume them with <span class="mark">at-least-once delivery</span> and update the order status.</p>
+        <p style="margin: 0">Failed jobs retry with backoff for <span style="background: #FBF1EE; color: #9A4A3A; text-decoration: line-through">5 minutes</span> <span style="background: #ECF6EF; color: #24613B">up to 1 hour, then a dead-letter queue</span>.</p>
+        <span class="bubble on" style="right: -48px; top: 160px" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+        <span class="bubble" style="right: -48px; top: 270px" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></span>
+        <span class="pop hero-note" style="right: -312px; top: 140px" aria-hidden="true"><small>Line 14 · 2 min ago</small>Then every handler has to be idempotent. Say how.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" class="wrap section">
+    <p class="eyebrow" style="margin: 0 0 12px">How it works</p>
+    <h2 class="h2">Read, comment, copy. That’s the loop.</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-top: 40px">
+      <div class="card">
+        <p class="eyebrow" style="margin: 0 0 14px">01</p>
+        <h3 style="margin: 0 0 10px; font-size: 21px">Open a folder</h3>
+        <p style="margin: 0 0 18px; color: #5A5E66; line-height: 1.6">Point it at your plans, specs or docs. Folders open with their README or AGENTS.md.</p>
+        <code style="display: block; padding: 12px 14px; border-radius: 10px; background: #F6F5F1; font-size: 14px">npx mdifit docs/</code>
+      </div>
+      <div class="card">
+        <p class="eyebrow" style="margin: 0 0 14px">02</p>
+        <h3 style="margin: 0 0 10px; font-size: 21px">Comment while you read</h3>
+        <p style="margin: 0 0 18px; color: #5A5E66; line-height: 1.6">Select a phrase and press <span class="kbd">C</span> to comment or <span class="kbd">S</span> to suggest a rewrite. It stays a quiet mark in the margin.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.7">…workers consume them with <span class="mark">at-least-once delivery</span>.</p>
+      </div>
+      <div class="card">
+        <p class="eyebrow" style="margin: 0 0 14px">03</p>
+        <h3 style="margin: 0 0 10px; font-size: 21px">Copy one prompt</h3>
+        <p style="margin: 0 0 18px; color: #5A5E66; line-height: 1.6">Press <span class="kbd">P</span>. Every note becomes <code>file:line</code> plus your feedback, ready to paste into your agent.</p>
+        <code style="display: block; padding: 12px 14px; border-radius: 10px; background: #F6F5F1; font-size: 14px">queue-migration.md:L14</code>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+      <div style="flex: 1 1 360px; min-width: 0">
+        <p class="eyebrow" style="margin: 0 0 12px">The prompt</p>
+        <h2 class="h2">Every note, one paste.</h2>
+        <p class="lead">Locations are relative to where you ran mdifit, quotes travel with each note so they survive edits, and suggested edits come as before / after. The same format as difit, so your agent already knows it.</p>
+        <p style="margin: 24px 0 0; font-size: 15px; color: #5A5E66">Works with Claude Code, Codex, opencode, or any chat.</p>
+      </div>
+      <pre style="flex: 1 1 460px; min-width: 0; margin: 0; padding: 28px; border-radius: 16px; background: #1E2023; color: #E9E7E1; font: 14px/1.7 'IBM Plex Mono', monospace; white-space: pre-wrap; overflow-x: auto"><span style="color: #D9C99A">docs/architecture/queue-migration.md:L14</span>
+<span style="color: #8E9198">&gt; at-least-once delivery</span>
+Then every handler has to be idempotent. Say how.
+<span style="color: #6E7178">=====</span>
+<span style="color: #D9C99A">docs/architecture/queue-migration.md:L18</span>
+ORIGINAL:
+<span style="color: #F0A493">5 minutes</span>
+SUGGESTED:
+<span style="color: #8FD6A8">up to 1 hour, then a dead-letter queue</span>
+<span style="color: #6E7178">=====</span>
+<span style="color: #D9C99A">docs/architecture/queue-migration.md:L27</span>
+<span style="color: #8E9198">&gt; Workers</span>
+How many, and what scales them?</pre>
+    </div>
+  </section>
+
+  <section class="wrap section" aria-labelledby="diagrams-title">
+    <div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+      <div style="flex: 1 1 340px; min-width: 0">
+        <p class="eyebrow" style="margin: 0 0 12px">New · Mermaid support</p>
+        <h2 id="diagrams-title" class="h2">Review the diagram, not just the prose.</h2>
+        <p class="lead">Architecture plans live in Mermaid. mdifit draws every <code>```mermaid</code> block like GitHub does, in light or dark, and the labels are real text: select a node, comment on it, and the note points at the exact line that defines it.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; font-size: 14px; color: #5A5E66">
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">Flowcharts</span>
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">Sequence</span>
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">State</span>
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">ER</span>
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">Diagram / Code switch</span>
+          <span style="padding: 6px 12px; border: 1px solid #E7E4DD; border-radius: 999px; background: #FFFFFF">Full-size view</span>
+        </div>
+      </div>
+      <div style="flex: 1 1 520px; min-width: 0; position: relative; padding: 52px 28px 32px; border: 1px solid #E2DED5; border-radius: 18px; background: #FFFFFF; box-shadow: 0 24px 60px rgba(60,50,20,0.08); box-sizing: border-box">
+        <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: #F3F2EE; font-size: 12px; color: #6B6F76"><span style="padding: 2px 10px; border-radius: 6px; background: #FFFFFF; color: #1E2023">Diagram</span><span style="padding: 2px 10px">Code</span></div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px; font-size: 14px">
+          <span style="padding: 12px 16px; border: 1.5px solid #8D8A80; border-radius: 8px; background: #F6F5F1">API</span>
+          <span aria-hidden="true" style="color: #8D8A80">→</span>
+          <span style="padding: 12px 16px; border: 1.5px solid #8D8A80; border-radius: 22px; background: #F6F5F1">Outbox</span>
+          <span aria-hidden="true" style="color: #8D8A80">→</span>
+          <span style="padding: 12px 16px; border: 1.5px solid #8D8A80; border-radius: 8px; background: #F6F5F1">Queue</span>
+          <span aria-hidden="true" style="color: #8D8A80">→</span>
+          <span style="padding: 12px 16px; border: 1.5px solid #8D8A80; border-radius: 8px; background: #F5F0E3"><span class="mark">Workers</span></span>
+          <span aria-hidden="true" style="color: #8D8A80">→</span>
+          <span style="padding: 12px 16px; border: 1.5px solid #8D8A80; border-radius: 8px; background: #F6F5F1">Dead letters</span>
+        </div>
+        <div style="display: flex; justify-content: flex-end; align-items: flex-start; gap: 10px; margin-top: 28px">
+          <span class="pop" style="position: static; width: 250px"><small>Line 27 · just now</small>How many, and what scales them?</span>
+          <span class="bubble on" style="position: static; flex: none" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></span>
+        </div>
+        <pre style="margin: 24px 0 0; padding: 14px 16px; border-radius: 10px; background: #F6F5F1; font: 13px/1.6 'IBM Plex Mono', monospace; color: #3A3D42; white-space: pre-wrap">```mermaid
+flowchart LR
+  API --> Outbox[(Outbox)] --> Queue --> <span class="mark">Workers</span> --> DLQ[Dead letters]
+```</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="wrap section">
+    <p class="eyebrow" style="margin: 0 0 12px">Features</p>
+    <h2 class="h2">A reader first. A review tool when you need it.</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 40px 32px; margin-top: 44px">
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div><h3>Comments in the margin</h3><p>A soft underline and a bubble. Nothing pushes the text around while you read.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></div><h3>Suggested edits</h3><p>Propose the exact rewrite and preview it inline before you save it.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div><h3>Folders that make sense</h3><p>A breadcrumb, a file tree, and folders that open with their README or AGENTS.md.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"></path><path d="M20 20l-3.5-3.5"></path></svg></div><h3>Search everything</h3><p><span class="kbd">⌘K</span> finds files, headings and text across the folder, accents ignored.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="7" height="6" rx="1.5"></rect><rect x="14" y="14" width="7" height="6" rx="1.5"></rect><path d="M10 7h4a3 3 0 0 1 3 3v4"></path></svg></div><h3>Mermaid diagrams</h3><p>Rendered like GitHub, light or dark, loaded only when a file has one.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"></path><path d="M21 3v5h-5"></path></svg></div><h3>Live while agents write</h3><p>The page updates as files change, and a file edited after you read it says so.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></div><h3>Reading progress</h3><p>Mark files read and pick up where you left off: next unread is one key away.</p></div>
+      <div class="feat"><div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg></div><h3>Local and private</h3><p>Runs on localhost, reads only your folder, writes nothing. Comments stay in your browser.</p></div>
+    </div>
+  </section>
+
+  <section class="wrap section" style="padding-bottom: 120px">
+    <div style="padding: 64px 32px; border: 1px solid #E7E4DD; border-radius: 24px; background: #FFFFFF; text-align: center">
+      <h2 class="h2" style="font-size: clamp(32px, 4.5vw, 48px)">Your agents write. <span class="mark">You review.</span></h2>
+      <p class="lead" style="margin: 0 auto">One command, any folder of Markdown.</p>
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; margin-top: 32px">
+        <div class="cmd"><span><span class="dollar">$</span> npx mdifit</span><button type="button" class="copy" data-copy="npx mdifit">Copy</button></div>
+        <a href="https://github.com/pechitook/mdifit" class="ghost-link">Star on GitHub <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap" style="display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; padding-top: 28px; padding-bottom: 40px; border-top: 1px solid #E7E4DD; font-size: 14px; color: #6B6F76">
+    <span style="font-weight: 600; color: #1E2023">mdifit</span>
+    <span>MIT licensed</span>
+    <a href="https://github.com/pechitook/mdifit" style="color: #6B6F76">GitHub</a>
+    <a href="https://www.npmjs.com/package/mdifit" style="color: #6B6F76">npm</a>
+    <span style="margin-left: auto">Made by Pablo Chiappetti</span>
+  </footer>
+</div>
+
+<script>
+  // Copy buttons: put the command on the clipboard and say so for a moment.
+  for (const button of document.querySelectorAll('[data-copy]')) {
+    const label = button.lastChild
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy)
+        button.setAttribute('data-done', '')
+        label.textContent = 'Copied'
+        setTimeout(() => {
+          button.removeAttribute('data-done')
+          label.textContent = 'Copy'
+        }, 1600)
+      } catch {
+        // Clipboard blocked: the command is still visible to copy by hand.
+      }
+    })
+  }
+</script>
+</body>
+</html>

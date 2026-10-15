@@ -12,8 +12,16 @@
     "prompt",
     "review"
   ],
+  "homepage": "https://github.com/pechitook/mdifit#readme",
+  "bugs": {
+    "url": "https://github.com/pechitook/mdifit/issues"
+  },
   "license": "MIT",
   "author": "Pablo Chiappetti",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pechitook/mdifit.git"
+  },
   "bin": {
     "mdifit": "dist/node/cli/index.js"
   },
@@ -24,6 +32,10 @@
     "CHANGELOG.md"
   ],
   "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "dev": "node scripts/dev.js",
     "build": "npm run build:client && npm run build:node",

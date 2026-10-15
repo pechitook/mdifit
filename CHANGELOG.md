@@ -20,3 +20,5 @@ All notable changes to this project are documented here. The format follows
 - Live reload when files change on disk.
 - Folder pages: a folder opens with its `README.md` / `AGENTS.md` / `index.md` under a
   foldable file list, or shows the list when it has none. Clickable breadcrumb.
+- Mermaid diagrams, loaded on demand, following the light/dark theme, with a Diagram / Code
+  switch, a full-size view and comments on node labels.

@@ -29,7 +29,8 @@ same way into Claude Code, Codex, opencode or any chat.
 - **Browse folders**: a folder opens with its `README.md` or `AGENTS.md`, with its file
   list one click away; a breadcrumb takes you back up.
 - **Reads like a Markdown reader**: GitHub-flavored Markdown, tables, task lists,
-  `> [!NOTE]` alerts, syntax highlighting, relative links and images, light and dark.
+  `> [!NOTE]` alerts, syntax highlighting, Mermaid diagrams, relative links and images,
+  light and dark.
 - **Comment while you read**: select any text and press <kbd>C</kbd>, or click a block's
   line number. The comment points at the exact source lines of the selection.
 - **Suggest edits**: select text and press <kbd>S</kbd> to propose a replacement; it goes

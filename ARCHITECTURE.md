@@ -81,6 +81,18 @@ Front matter is replaced by blank lines before parsing, so line numbers stay tru
 separately. The reader lays those blocks out with Vue, which is what lets comment cards and
 the composer sit *between* blocks instead of being injected into raw HTML.
 
+### Mermaid diagrams
+
+A top-level ` ```mermaid ` fence becomes a block with `diagram` set to its source (nested
+fences stay code). `views/Reader/components/DiagramBlock.vue` draws it through
+`utils/mermaid.ts`, which imports Mermaid on first use, so it ships as separate chunks that
+documents without diagrams never download. Renders run one at a time, with
+`securityLevel: 'strict'`, the light or dark theme from `prefers-color-scheme`, and a cache
+by theme + source so live reloads and new comments do not redraw. A syntax error shows the
+code with Mermaid's first error line. The block keeps its source lines, so `+` comments the
+whole diagram, and selecting a node label narrows the comment to the line that defines it.
+Each diagram has a Diagram / Code switch and a full-size view.
+
 ### From a selection to `file:L24-L25`
 
 1. `utils/dom.ts#readSelection` finds the closest `[data-line-start]` of both ends of the
@@ -134,12 +146,13 @@ comments never mix with real ones.
 
 `npm run build` writes `dist/client` (Vite) and `dist/node` (tsc, `.ts` imports rewritten to
 `.js`). The published package ships `dist/` only; runtime dependencies are `hono` and
-`@hono/node-server`, everything the client needs is bundled.
+`@hono/node-server`, everything the client needs is bundled (Mermaid included, as lazy
+chunks).
 
 ## Follow-ups
 
 - Sanitized raw HTML (`<details>`, `<br>`) instead of escaping it (ADR-002).
 - Re-anchoring comments by quote after a file changes, instead of keeping line numbers.
-- Mermaid diagrams, math.
+- Math (KaTeX) and Graphviz, loaded on demand like Mermaid.
 - An agent loop (`--wait` that blocks until "Submit review" and prints the prompt) was
   designed and deliberately left out of v1.

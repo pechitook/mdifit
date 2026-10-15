@@ -156,3 +156,69 @@ export function classifySourceLines(lines: string[]): SourceLineKind[] {
   })
   return kinds
 }
+
+// --- margin layout (Read view) ---------------------------------------------------
+
+export interface Marker {
+  id: string
+  /** Top of the commented text, relative to the page. */
+  top: number
+}
+
+/** Bubbles keep their line but never overlap: a crowded one moves just below the previous. */
+export function stackMarkers(markers: Marker[], size: number, gap = 4): Marker[] {
+  const placed: Marker[] = []
+  for (const marker of markers.toSorted((a, b) => a.top - b.top)) {
+    const previous = placed.at(-1)
+    const top = previous ? Math.max(marker.top, previous.top + size + gap) : marker.top
+    placed.push({ id: marker.id, top })
+  }
+  return placed
+}
+
+export interface PopoverPlacement {
+  top: number
+  left: number
+  /** `margin`: beside the text. `below`: over the text, under the anchor. */
+  side: 'margin' | 'below'
+}
+
+export interface PopoverInput {
+  /** Commented text, relative to the page. */
+  anchor: { top: number; bottom: number }
+  /** Width of the page (text column plus its gutters). */
+  pageWidth: number
+  /** Free space to the right of the page inside the reader. */
+  marginSpace: number
+  /** Right gutter of the page, where the bubbles sit. */
+  gutter: number
+  width: number
+}
+
+/**
+ * Beside the text when the window has room for it (starting just past the
+ * bubbles, inside the page's right gutter), otherwise under the anchor line.
+ */
+export function placePopover(input: PopoverInput): PopoverPlacement {
+  if (input.marginSpace >= input.width) {
+    return { side: 'margin', top: Math.max(0, input.anchor.top - 10), left: input.pageWidth - 14 }
+  }
+  return {
+    side: 'below',
+    top: input.anchor.bottom + 10,
+    left: Math.max(0, input.pageWidth - input.gutter - input.width),
+  }
+}
+
+/** Comments of a file in reading order, for previous / next. */
+export function readingOrder<T extends { id: string; startLine: number; createdAt: number }>(
+  comments: T[],
+): T[] {
+  return comments.toSorted((a, b) => a.startLine - b.startLine || a.createdAt - b.createdAt)
+}
+
+export function linesLabel(range: { startLine: number; endLine: number }): string {
+  return range.startLine === range.endLine
+    ? `Line ${range.startLine}`
+    : `Lines ${range.startLine}–${range.endLine}`
+}

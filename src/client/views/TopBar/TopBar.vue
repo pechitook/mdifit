@@ -124,11 +124,11 @@ const emit = defineEmits<{
       type="button"
       class="btn btn-comment"
       :disabled="commentCount === 0"
+      title="Review and copy the prompt (P)"
       @click="emit('openPrompt')"
     >
       <Icon name="copy" />
-      Copy all prompt ({{ commentCount }})
-      <kbd>P</kbd>
+      Copy prompt · {{ commentCount }}
     </button>
     <button
       type="button"

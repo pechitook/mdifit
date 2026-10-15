@@ -102,14 +102,14 @@ pre {
 }
 
 .btn-comment {
-  border-color: var(--comment-border);
-  background: var(--comment-button);
-  color: var(--comment-text);
-  font-weight: 600;
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
 }
 
 .btn-comment:hover {
-  background: var(--comment-chip);
+  background: var(--hover);
 }
 
 .btn-suggest {
@@ -185,6 +185,69 @@ kbd {
   background: var(--surface);
   color: var(--text);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+/* Popovers in the reader's margin (composer, opened comment). */
+
+.margin-pop {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 296px;
+  padding: 12px 12px 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.margin-pop .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 24px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.margin-pop .foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.margin-pop .ghost,
+.margin-pop .primary {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  font-size: 13px;
+}
+
+.margin-pop .ghost {
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.margin-pop .ghost:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.margin-pop .primary {
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
 }
 
 dialog {

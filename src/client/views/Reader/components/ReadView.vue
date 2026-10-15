@@ -3,6 +3,10 @@ import Icon from '../../../components/ui/Icon.vue'
 import type { RenderedBlock } from '../../../utils/markdown.ts'
 import DiagramBlock from './DiagramBlock.vue'
 
+/**
+ * The rendered document, one section per top-level block. No line numbers:
+ * the only affordance is a faint + in the left margin on hover.
+ */
 defineProps<{ blocks: RenderedBlock[] }>()
 const emit = defineEmits<{ addAt: [block: RenderedBlock] }>()
 </script>
@@ -16,64 +20,41 @@ const emit = defineEmits<{ addAt: [block: RenderedBlock] }>()
       :data-line-start="block.startLine"
       :data-line-end="block.endLine"
     >
-      <div class="gutter">
-        <button
-          type="button"
-          class="add"
-          :aria-label="`Comment on line ${block.startLine}`"
-          title="Comment on this block"
-          @click="emit('addAt', block)"
-        >
-          <Icon name="plus" :size="14" :stroke-width="2.6" />
-        </button>
-        <span class="line">{{ block.startLine }}</span>
-      </div>
+      <button
+        type="button"
+        class="add"
+        :aria-label="`Comment on line ${block.startLine}`"
+        title="Comment on this block"
+        @click="emit('addAt', block)"
+      >
+        <Icon name="plus" :size="14" :stroke-width="2.2" />
+      </button>
       <DiagramBlock v-if="block.diagram !== null" :source="block.diagram" :code-html="block.html" />
       <div v-else class="markdown" data-doc v-html="block.html" />
-      <div class="after">
-        <slot name="after" :block="block" />
-      </div>
     </section>
   </div>
 </template>
 
 <style scoped>
 .block {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  border-radius: 6px;
-}
-
-.gutter {
   position: relative;
-  grid-row: span 2;
-  padding-right: 14px;
-  text-align: right;
-}
-
-.line {
-  display: block;
-  padding-top: 6px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-faint);
-  user-select: none;
 }
 
 .add {
   position: absolute;
-  top: 3px;
-  left: 0;
+  top: 4px;
+  left: -42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--link);
-  color: #ffffff;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+  color: var(--text-muted);
   opacity: 0;
+  transition: opacity 120ms ease;
 }
 
 .block:hover .add,
@@ -81,23 +62,22 @@ const emit = defineEmits<{ addAt: [block: RenderedBlock] }>()
   opacity: 1;
 }
 
-.block:hover .line {
+.add:hover {
+  border-color: var(--mark-line);
   color: var(--text);
 }
 
 .markdown {
-  padding-bottom: 1em;
+  padding-bottom: 1.1em;
 }
 
 .markdown :deep(> *) {
   margin-bottom: 0;
 }
 
-.after {
-  grid-column: 2;
-}
-
-.after:empty {
-  display: none;
+@media (max-width: 700px) {
+  .add {
+    display: none;
+  }
 }
 </style>

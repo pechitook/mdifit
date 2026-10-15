@@ -5,6 +5,7 @@ export type IconName =
   | 'file'
   | 'folder'
   | 'chevron-right'
+  | 'chevron-left'
   | 'chevron-down'
   | 'check'
   | 'copy'
@@ -25,6 +26,7 @@ const PATHS: Record<IconName, string[]> = {
   file: ['M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z', 'M14 3v6h6'],
   folder: ['M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
   'chevron-right': ['M9 6l6 6-6 6'],
+  'chevron-left': ['M15 6l-6 6 6 6'],
   'chevron-down': ['M6 9l6 6 6-6'],
   check: ['M5 12l5 5 9-10'],
   copy: ['M9 9h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2z', 'M5 15V5a2 2 0 0 1 2-2h10'],

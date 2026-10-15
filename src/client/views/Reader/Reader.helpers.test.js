@@ -4,9 +4,13 @@ import {
   classifySourceLines,
   draftFromComment,
   draftToComment,
+  linesLabel,
   newDraft,
   originalText,
   placeAfterBlocks,
+  placePopover,
+  readingOrder,
+  stackMarkers,
   switchMode,
 } from './Reader.helpers.ts'
 
@@ -144,5 +148,60 @@ describe('classifySourceLines', () => {
       'fence',
       'text',
     ])
+  })
+})
+
+describe('stackMarkers', () => {
+  it('keeps markers on their line and pushes overlapping ones down', () => {
+    expect(
+      stackMarkers(
+        [
+          { id: 'b', top: 110 },
+          { id: 'a', top: 100 },
+          { id: 'c', top: 300 },
+        ],
+        28,
+      ),
+    ).toEqual([
+      { id: 'a', top: 100 },
+      { id: 'b', top: 132 },
+      { id: 'c', top: 300 },
+    ])
+  })
+})
+
+describe('placePopover', () => {
+  const base = { anchor: { top: 200, bottom: 230 }, pageWidth: 780, gutter: 72, width: 308 }
+
+  it('goes in the margin when there is room', () => {
+    expect(placePopover({ ...base, marginSpace: 308 })).toEqual({
+      side: 'margin',
+      top: 190,
+      left: 766,
+    })
+  })
+
+  it('goes under the anchor, aligned to the text, when there is not', () => {
+    expect(placePopover({ ...base, marginSpace: 100 })).toEqual({
+      side: 'below',
+      top: 240,
+      left: 400,
+    })
+  })
+})
+
+describe('readingOrder and linesLabel', () => {
+  it('orders by line then creation', () => {
+    const order = readingOrder([
+      { id: 'b', startLine: 9, createdAt: 1 },
+      { id: 'a2', startLine: 3, createdAt: 2 },
+      { id: 'a1', startLine: 3, createdAt: 1 },
+    ])
+    expect(order.map((c) => c.id)).toEqual(['a1', 'a2', 'b'])
+  })
+
+  it('labels one line or a range', () => {
+    expect(linesLabel({ startLine: 19, endLine: 19 })).toBe('Line 19')
+    expect(linesLabel({ startLine: 9, endLine: 11 })).toBe('Lines 9–11')
   })
 })

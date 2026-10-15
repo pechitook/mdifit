@@ -1,8 +1,8 @@
 /* Rendered Markdown, scoped to `.markdown`. Close to GitHub, tuned for reading. */
 
 .markdown {
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: 18px;
+  line-height: 1.75;
   overflow-wrap: break-word;
 }
 
@@ -178,4 +178,40 @@
 
 .markdown a {
   text-underline-offset: 2px;
+}
+
+/* Comment marks, painted with the CSS Custom Highlight API (views/Reader/marks.ts). */
+
+::highlight(mdifit-comment) {
+  text-decoration-line: underline;
+  text-decoration-color: var(--mark-line);
+  text-decoration-thickness: 2px;
+}
+
+::highlight(mdifit-suggest) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--suggest-line);
+  text-decoration-thickness: 2px;
+}
+
+::highlight(mdifit-active) {
+  background-color: var(--mark-active);
+}
+
+::highlight(mdifit-pending) {
+  background-color: var(--pending);
+}
+
+::highlight(mdifit-del) {
+  background-color: var(--del-bg);
+  color: var(--del-text);
+  text-decoration-line: line-through;
+}
+
+.mdifit-preview {
+  border-radius: 2px;
+  background: var(--add-bg);
+  color: var(--add-text);
+  text-decoration: none;
 }

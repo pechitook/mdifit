@@ -22,13 +22,18 @@
   --primary: #1e2023;
   --primary-text: #ffffff;
 
-  --comment-bg: #fffcf0;
-  --comment-chip: #fff0b8;
-  --comment-button: #fff4cc;
-  --comment-border: #c99a1e;
-  --comment-ring: #fff0b8;
-  --comment-text: #6b4a00;
-  --mark: #ffe89a;
+  /* Comments stay quiet: neutral surfaces, one warm-gray accent for marks. */
+  --comment-bg: #ffffff;
+  --comment-chip: #f3f2ee;
+  --comment-button: #ffffff;
+  --comment-border: #e4e1da;
+  --comment-ring: #f3f2ee;
+  --comment-text: #5a5e66;
+  --mark: #f3ead0;
+  --mark-line: #cdbf9a;
+  --mark-active: #f5f0e3;
+  --pending: #e6edfb;
+  --suggest-line: #93bba0;
 
   --suggest: #2f7d4f;
   --suggest-bg: #ddf0e3;
@@ -75,13 +80,17 @@
     --primary: #e7e5df;
     --primary-text: #131416;
 
-    --comment-bg: #26210f;
-    --comment-chip: #3a3012;
-    --comment-button: #33290c;
-    --comment-border: #b8902a;
-    --comment-ring: #3a3012;
-    --comment-text: #f2d27a;
-    --mark: #5a4810;
+    --comment-bg: #1a1b1e;
+    --comment-chip: #26282c;
+    --comment-button: #1a1b1e;
+    --comment-border: #34363c;
+    --comment-ring: #26282c;
+    --comment-text: #a6a9b0;
+    --mark: #4a3f22;
+    --mark-line: #8c7a4e;
+    --mark-active: #2e2918;
+    --pending: #22304d;
+    --suggest-line: #4e8a63;
 
     --suggest: #4fae75;
     --suggest-bg: #173123;

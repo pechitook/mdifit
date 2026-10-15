@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { locateInSegments, snapEnd, snapStart } from './textRange.ts'
 
 describe('snapStart / snapEnd', () => {
-  const text = 'Pablo también reemplazó la exigencia'
+  const text = 'Redis también reintentó la publicación'
 
   it('extends a cut word to its start and end', () => {
-    // "lo también reemplazó la exig" → "Pablo también reemplazó la exigencia"
+    // "is también reintentó la publ" → "Redis también reintentó la publicación"
     expect(snapStart(text, 3)).toBe(0)
     expect(snapEnd(text, 31)).toBe(text.length)
   })
@@ -28,27 +28,27 @@ describe('snapStart / snapEnd', () => {
 
 describe('locateInSegments', () => {
   const segments = [
-    'El agente debe ',
-    'verificar',
-    ' que el resultado\n  persiste para el próximo run.',
+    'El worker debe ',
+    'confirmar',
+    ' que el resultado\n  persiste en la cola de salida.',
   ]
 
   it('finds a quote across segments, ignoring line breaks and spacing', () => {
-    expect(locateInSegments(segments, 'verificar que el resultado persiste')).toEqual({
+    expect(locateInSegments(segments, 'confirmar que el resultado persiste')).toEqual({
       start: { segment: 1, offset: 0 },
       end: { segment: 2, offset: 28 },
     })
   })
 
   it('finds it inside one segment', () => {
-    expect(locateInSegments(segments, 'agente debe')).toEqual({
+    expect(locateInSegments(segments, 'worker debe')).toEqual({
       start: { segment: 0, offset: 3 },
       end: { segment: 0, offset: 14 },
     })
   })
 
   it('falls back to a case-insensitive match', () => {
-    expect(locateInSegments(segments, 'EL AGENTE')?.start).toEqual({ segment: 0, offset: 0 })
+    expect(locateInSegments(segments, 'EL WORKER')?.start).toEqual({ segment: 0, offset: 0 })
   })
 
   it('returns null when the quote is gone or empty', () => {

@@ -30,9 +30,9 @@ describe('formatComment', () => {
   })
 
   it('quotes the selection when asked', () => {
-    const c = comment({ quote: 'enable it first\non GrokBot' })
+    const c = comment({ quote: 'move emails first\nand payments last' })
     expect(formatComment(c, options)).toBe(
-      'plans/release.md:L14\n> enable it first\n> on GrokBot\nAdd a rollback criterion.',
+      'plans/release.md:L14\n> move emails first\n> and payments last\nAdd a rollback criterion.',
     )
     expect(formatComment(c, { ...options, includeQuotes: false })).toBe(
       'plans/release.md:L14\nAdd a rollback criterion.',
@@ -43,8 +43,8 @@ describe('formatComment', () => {
     const c = comment({
       startLine: 47,
       endLine: 47,
-      quote: '50 agents per release',
-      suggestion: '20 agents per batch',
+      quote: '50 messages per second',
+      suggestion: '20 messages per second',
       body: '',
     })
     expect(formatComment(c, options)).toBe(
@@ -52,11 +52,11 @@ describe('formatComment', () => {
         'plans/release.md:L47',
         'ORIGINAL:',
         '```',
-        '50 agents per release',
+        '50 messages per second',
         '```',
         'SUGGESTED:',
         '```',
-        '20 agents per batch',
+        '20 messages per second',
         '```',
       ].join('\n'),
     )

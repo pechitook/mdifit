@@ -2,30 +2,30 @@ import { describe, expect, it } from 'vitest'
 import { locateQuote, plain } from './quote.ts'
 
 const source = [
-  '# Plan', //                                                          1
-  '', //                                                                2
-  'Shared backend in Synapse, an admin command in devscripts and a', // 3
-  'short contract in agent-kit. Version the nine current guides;', //   4
-  '**enable the reconciliation mechanism** first on GrokBot and', //    5
-  'check it afterwards on [Dot](dot.md).', //                          6
+  '# Plan', //                                                                1
+  '', //                                                                      2
+  'An outbox table in the orders database, a relay that publishes it and', // 3
+  'one consumer group per side effect. Migrate the current side effects;', // 4
+  '**move email confirmations first** and payment capture last, once', //    5
+  'retries are proven on [staging](staging.md).', //                         6
 ]
 const paragraph = { startLine: 3, endLine: 6 }
 
 describe('locateQuote', () => {
   it('narrows a one-line quote to its line, ignoring inline markup', () => {
     expect(
-      locateQuote(source, paragraph, 'enable the reconciliation mechanism first on GrokBot'),
+      locateQuote(source, paragraph, 'move email confirmations first and payment capture last'),
     ).toEqual({ startLine: 5, endLine: 5 })
   })
 
   it('spans the lines a wrapped quote covers', () => {
     expect(
-      locateQuote(source, paragraph, 'Version the nine current guides; enable the reconciliation'),
+      locateQuote(source, paragraph, 'Migrate the current side effects; move email confirmations'),
     ).toEqual({ startLine: 4, endLine: 5 })
   })
 
   it('matches link text, not the URL', () => {
-    expect(locateQuote(source, paragraph, 'check it afterwards on Dot')).toEqual({
+    expect(locateQuote(source, paragraph, 'retries are proven on staging')).toEqual({
       startLine: 6,
       endLine: 6,
     })

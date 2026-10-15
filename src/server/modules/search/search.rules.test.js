@@ -7,7 +7,7 @@ const plan = [
   '---',
   '# Implementación de releases',
   '',
-  'Habilitar el mecanismo de reconciliación primero en GrokBot.',
+  'Habilitar el mecanismo de reconciliación primero en el worker de pedidos.',
   '',
   '```bash',
   '# reconciliación inside a fence',

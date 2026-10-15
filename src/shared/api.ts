@@ -5,7 +5,7 @@
  */
 
 export interface WorkspaceFile {
-  /** POSIX path relative to the workspace root: `agent-kit/plan.md`. */
+  /** POSIX path relative to the workspace root: `orders/plan.md`. */
   path: string
   /** First `# heading` (or front matter `title`), when the file has one. */
   title: string | null

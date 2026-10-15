@@ -4,7 +4,7 @@ import { normalize } from '../../utils/text.ts'
 
 /**
  * Builds the file tree the sidebar shows. Folders with a single child folder
- * are compacted (`plans/agent-kit`), like in most editors.
+ * are compacted (`plans/orders`), like in most editors.
  */
 
 export type FileFilter = 'all' | 'unread' | 'commented'

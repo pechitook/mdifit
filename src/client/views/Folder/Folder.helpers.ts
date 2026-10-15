@@ -95,7 +95,7 @@ export function listFolder(
   return { folders: [...folders.values()].toSorted(byName), files: direct.toSorted(byName) }
 }
 
-/** The folder's own name: `plans/openclaw/` → `openclaw`; the root uses `rootName`. */
+/** The folder's own name: `plans/queue/` → `queue`; the root uses `rootName`. */
 export function folderName(folder: string, rootName: string): string {
   return folder === '' ? rootName : (folder.slice(0, -1).split('/').at(-1) ?? rootName)
 }

@@ -187,7 +187,12 @@ async function revealAnchor(): Promise<void> {
   const pathChanged = shownPath !== props.file.path
   shownPath = props.file.path
 
-  const line = lineAnchor(props.anchor)
+  // In the Source view a heading anchor scrolls to the heading's line.
+  const headingLine =
+    props.mode === 'source'
+      ? props.rendered.headings.find((heading) => heading.slug === props.anchor)?.line
+      : undefined
+  const line = lineAnchor(props.anchor) ?? headingLine ?? null
   if (line !== null) {
     const selector =
       props.mode === 'read'

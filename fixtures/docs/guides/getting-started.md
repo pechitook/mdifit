@@ -27,3 +27,36 @@ with the requested guide and verifies the change persisted. See the
 | -------------------- | ----------------------------- |
 | No release request   | Agent already on that version |
 | Request every hour   | `guide.applied` never sent    |
+
+## How a release reaches an agent
+
+```mermaid
+flowchart LR
+  subgraph Synapse["Synapse"]
+    REL["Release command"]
+    HB[("Heartbeat reports")]
+  end
+  subgraph Agent["OpenClaw gateway"]
+    CTRL["Control account"]
+    CFG[("openclaw.json")]
+  end
+  REL -->|"selects older versions"| HB
+  REL -->|"backchannel request"| CTRL
+  CTRL -->|"guide.applied"| REL
+  CTRL --> CFG
+  classDef gw fill:#fde68a,stroke:#b45309,color:#000;
+  class CTRL gw;
+```
+
+```mermaid
+sequenceDiagram
+  participant S as Synapse
+  participant A as Agent
+  S->>A: Compare guide 2026.10.15 with your setup
+  A-->>S: guide.applied
+```
+
+```mermaid
+flowchart LR
+  A --> 
+```

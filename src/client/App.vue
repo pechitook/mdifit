@@ -1,0 +1,373 @@
+<script setup lang="ts">
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import type { FileResponse, WorkspaceResponse } from '../shared/api.ts'
+import { adjacentPath, defaultPath, nextUnreadPath, readCount } from './App.helpers.ts'
+import { ApiError, getFile, getWorkspace, subscribeChanges } from './services/api.ts'
+import {
+  type Prefs,
+  type ReviewStore,
+  createReviewStore,
+  loadPrefs,
+  savePrefs,
+} from './stores/review.ts'
+import { countByPath, readStatus } from './stores/review.helpers.ts'
+import { copyText, isEditingTarget } from './utils/dom.ts'
+import { renderMarkdown } from './utils/markdown.ts'
+import { type Route, formatHash, parseHash } from './utils/route.ts'
+import { matchShortcut } from './utils/shortcuts.ts'
+import { pluralize } from './utils/text.ts'
+import type { PaletteItem } from './views/CommandPalette/CommandPalette.helpers.ts'
+import CommandPalette from './views/CommandPalette/CommandPalette.vue'
+import CommentsRail from './views/CommentsRail/CommentsRail.vue'
+import PromptDialog from './views/PromptDialog/PromptDialog.vue'
+import Reader from './views/Reader/Reader.vue'
+import ShortcutsDialog from './views/ShortcutsDialog/ShortcutsDialog.vue'
+import { buildTree, flattenFiles } from './views/Sidebar/Sidebar.helpers.ts'
+import Sidebar from './views/Sidebar/Sidebar.vue'
+import TopBar from './views/TopBar/TopBar.vue'
+
+/**
+ * The shell: loads the workspace, routes through the hash, owns the review
+ * store and the dialogs, and wires keyboard shortcuts. Screens render; the
+ * rules live in the helpers next to them.
+ */
+
+const workspace = shallowRef<WorkspaceResponse | null>(null)
+const store = shallowRef<ReviewStore | null>(null)
+const file = shallowRef<FileResponse | null>(null)
+const route = ref<Route>(parseHash(location.hash))
+const prefs = ref<Prefs>(loadPrefs())
+const error = ref<string | null>(null)
+const fileError = ref<string | null>(null)
+const toast = ref<string | null>(null)
+const dialog = ref<'prompt' | 'palette' | 'help' | null>(null)
+const reader = ref<InstanceType<typeof Reader> | null>(null)
+
+const files = computed(() => workspace.value?.files ?? [])
+const comments = computed(() => store.value?.state.comments ?? [])
+const read = computed(() => store.value?.state.read ?? {})
+const commentCounts = computed(() => countByPath(comments.value))
+const treeOrder = computed(() =>
+  flattenFiles(
+    buildTree({ files: files.value, read: {}, commentCounts: new Map(), filter: 'all', query: '' }),
+  ).map((node) => node.path),
+)
+const currentFile = computed(() => files.value.find((f) => f.path === route.value.path) ?? null)
+const rendered = computed(() =>
+  file.value ? renderMarkdown(file.value.source, file.value.path) : null,
+)
+const fileComments = computed(() => comments.value.filter((c) => c.path === file.value?.path))
+const status = computed(() =>
+  currentFile.value ? readStatus(currentFile.value, read.value) : 'unread',
+)
+const nextPath = computed(() =>
+  nextUnreadPath(treeOrder.value, files.value, read.value, route.value.path),
+)
+const promptBase = computed(() => workspace.value?.promptBase ?? '')
+
+watch(prefs, savePrefs, { deep: true })
+
+// --- loading -----------------------------------------------------------------
+
+async function loadWorkspace(): Promise<void> {
+  try {
+    const next = await getWorkspace()
+    if (!store.value || workspace.value?.rootPath !== next.rootPath)
+      store.value = createReviewStore(next.rootPath)
+    workspace.value = next
+    error.value = null
+    if (!route.value.path || !next.files.some((f) => f.path === route.value.path)) {
+      const fallback = defaultPath(next.files, treeOrder.value)
+      if (fallback && fallback !== route.value.path)
+        navigate({ path: fallback, anchor: null }, true)
+    }
+  } catch (e) {
+    error.value = e instanceof ApiError ? e.message : String(e)
+  }
+}
+
+let loadToken = 0
+async function loadFile(path: string): Promise<void> {
+  const token = ++loadToken
+  try {
+    const next = await getFile(path)
+    if (token !== loadToken) return
+    file.value = next
+    fileError.value = null
+    document.title = `${path} · mdifit`
+  } catch (e) {
+    if (token !== loadToken) return
+    fileError.value = e instanceof ApiError ? e.message : String(e)
+  }
+}
+
+watch(
+  () => route.value.path,
+  (path) => {
+    if (path) void loadFile(path)
+  },
+  { immediate: true },
+)
+
+function navigate(next: Route, replace = false): void {
+  const hash = formatHash(next)
+  if (replace) history.replaceState(null, '', hash)
+  else if (location.hash !== hash) location.hash = hash
+  route.value = next
+}
+
+function onHashChange(): void {
+  route.value = parseHash(location.hash)
+}
+
+// --- review actions ----------------------------------------------------------
+
+function toggleRead(): void {
+  const current = currentFile.value
+  if (!current || !store.value) return
+  if (status.value === 'read') store.value.markUnread(current.path)
+  else store.value.markRead(current)
+}
+
+function onCopied(count: number, ids: string[], clear: boolean): void {
+  if (clear) store.value?.clearComments(ids)
+  dialog.value = null
+  showToast(`Copied ${pluralize(count, 'comment')}${clear ? ' and deleted them' : ''}`)
+}
+
+async function copyPath(): Promise<void> {
+  if (route.value.path && (await copyText(`${promptBase.value}${route.value.path}`)))
+    showToast('Path copied')
+}
+
+function go(item: PaletteItem): void {
+  dialog.value = null
+  navigate({ path: item.path, anchor: item.line ? `L${item.line}` : null })
+}
+
+let toastTimer: ReturnType<typeof setTimeout> | undefined
+function showToast(message: string): void {
+  toast.value = message
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => (toast.value = null), 2200)
+}
+
+// --- keyboard ----------------------------------------------------------------
+
+function onKeydown(event: KeyboardEvent): void {
+  const action = matchShortcut({
+    key: event.key,
+    metaKey: event.metaKey,
+    ctrlKey: event.ctrlKey,
+    altKey: event.altKey,
+    editing: isEditingTarget(event.target),
+  })
+  if (!action) return
+  if (dialog.value && action !== 'palette') return
+
+  event.preventDefault()
+  switch (action) {
+    case 'palette':
+      dialog.value = dialog.value === 'palette' ? null : 'palette'
+      break
+    case 'comment':
+    case 'suggest':
+      if (!reader.value?.startFromSelection(action)) showToast('Select some text first')
+      break
+    case 'prompt':
+      if (comments.value.length) dialog.value = 'prompt'
+      else showToast('No comments yet')
+      break
+    case 'toggleRead':
+      toggleRead()
+      break
+    case 'toggleMode':
+      prefs.value.mode = prefs.value.mode === 'read' ? 'source' : 'read'
+      break
+    case 'nextFile':
+    case 'previousFile': {
+      const path = adjacentPath(treeOrder.value, route.value.path, action === 'nextFile' ? 1 : -1)
+      if (path) navigate({ path, anchor: null })
+      break
+    }
+    case 'help':
+      dialog.value = 'help'
+      break
+  }
+}
+
+// --- live reload -------------------------------------------------------------
+
+let unsubscribe: (() => void) | null = null
+
+onMounted(() => {
+  window.addEventListener('hashchange', onHashChange)
+  window.addEventListener('keydown', onKeydown)
+  void loadWorkspace()
+  unsubscribe = subscribeChanges((path) => {
+    void loadWorkspace()
+    if (path === route.value.path) void loadFile(path)
+  })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('hashchange', onHashChange)
+  window.removeEventListener('keydown', onKeydown)
+  unsubscribe?.()
+})
+</script>
+
+<template>
+  <div v-if="error" class="fatal" role="alert">
+    <h1>mdifit</h1>
+    <p>{{ error }}</p>
+    <button type="button" class="btn btn-primary" @click="loadWorkspace">Try again</button>
+  </div>
+
+  <div v-else-if="workspace && store" class="shell">
+    <TopBar
+      v-model:mode="prefs.mode"
+      :workspace-name="workspace.name"
+      :display-path="route.path ? `${promptBase}${route.path}` : null"
+      :read-count="readCount(files, read)"
+      :file-count="files.length"
+      :comment-count="comments.length"
+      @open-prompt="dialog = 'prompt'"
+      @open-palette="dialog = 'palette'"
+      @copy-path="copyPath"
+    />
+
+    <div class="body" :class="{ single: workspace.single }">
+      <Sidebar
+        v-if="!workspace.single"
+        :files="files"
+        :read="read"
+        :comment-counts="commentCounts"
+        :current-path="route.path"
+        :headings="rendered?.headings ?? []"
+      />
+
+      <Reader
+        v-if="file && rendered && file.path === route.path"
+        ref="reader"
+        :file="file"
+        :rendered="rendered"
+        :comments="fileComments"
+        :prompt-base="promptBase"
+        :mode="prefs.mode"
+        :anchor="route.anchor"
+        :status="status"
+        :next-path="nextPath"
+        @add="store.addComment($event)"
+        @update="(id, input) => store?.updateComment(id, input)"
+        @remove="store.removeComment($event)"
+        @toggle-read="toggleRead"
+        @toast="showToast"
+      />
+      <main v-else class="placeholder">
+        <p v-if="fileError" role="alert">{{ fileError }}</p>
+        <p v-else-if="files.length === 0">No Markdown files in {{ workspace.name }}.</p>
+        <p v-else>Loading…</p>
+      </main>
+
+      <CommentsRail
+        :comments="comments"
+        :current-path="route.path"
+        @open-prompt="dialog = 'prompt'"
+        @clear="store.clearComments($event)"
+      />
+    </div>
+
+    <PromptDialog
+      v-model:include-quotes="prefs.includeQuotes"
+      :open="dialog === 'prompt'"
+      :comments="comments"
+      :current-path="route.path"
+      :prompt-base="promptBase"
+      @close="dialog = null"
+      @copied="onCopied"
+    />
+    <CommandPalette :open="dialog === 'palette'" :files="files" @close="dialog = null" @go="go" />
+    <ShortcutsDialog :open="dialog === 'help'" @close="dialog = null" />
+
+    <div class="toast" role="status" aria-live="polite">
+      <span v-if="toast">{{ toast }}</span>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 290px minmax(0, 1fr) 320px;
+  min-height: 0;
+}
+
+.body.single {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.fatal {
+  max-width: 480px;
+  margin: 15vh auto;
+  padding: 0 16px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 40;
+  transform: translateX(-50%);
+}
+
+.toast span {
+  display: block;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-text);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-pop);
+}
+
+@media (max-width: 1100px) {
+  .body {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+
+  .body > .rail {
+    display: none;
+  }
+
+  .body.single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .body > .sidebar {
+    display: none;
+  }
+}
+</style>

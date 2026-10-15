@@ -1,0 +1,108 @@
+/* Design tokens. Components use these variables only, never raw colors. */
+
+:root {
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --panel: #fbfaf7;
+  --sunken: #efede7;
+  --border: #e3e1db;
+  --border-strong: #cfcbc1;
+
+  --text: #1e2023;
+  --text-muted: #5a5e66;
+  --text-faint: #767a82;
+
+  --link: #2b59c3;
+  --link-hover: #1c3f91;
+  --focus: #2b59c3;
+
+  --primary: #1e2023;
+  --primary-text: #ffffff;
+
+  --comment-bg: #fffcf0;
+  --comment-chip: #fff0b8;
+  --comment-button: #fff4cc;
+  --comment-border: #c99a1e;
+  --comment-ring: #fff0b8;
+  --comment-text: #6b4a00;
+  --mark: #ffe89a;
+
+  --suggest: #2f7d4f;
+  --suggest-bg: #ddf0e3;
+  --add-bg: #eef8f1;
+  --add-text: #1c5f3a;
+  --del-bg: #fdf1ee;
+  --del-text: #8e2a15;
+  --danger: #b4361c;
+
+  --selection: #c7d7f8;
+  --hover: #f1efe9;
+  --code-bg: #f3f2ee;
+  --flash: #fff0b8;
+
+  --alert-note: #2b59c3;
+  --alert-tip: #2f7d4f;
+  --alert-important: #7048c0;
+  --alert-warning: #9a6700;
+  --alert-caution: #b4361c;
+
+  --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.16);
+  --shadow-card: 0 4px 14px rgb(80 60 0 / 0.08);
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131416;
+    --surface: #1a1b1e;
+    --panel: #17181a;
+    --sunken: #222428;
+    --border: #2c2e33;
+    --border-strong: #3d4047;
+
+    --text: #e7e5df;
+    --text-muted: #a6a9b0;
+    --text-faint: #8b8f97;
+
+    --link: #8fb3f2;
+    --link-hover: #b5cdf7;
+    --focus: #8fb3f2;
+
+    --primary: #e7e5df;
+    --primary-text: #131416;
+
+    --comment-bg: #26210f;
+    --comment-chip: #3a3012;
+    --comment-button: #33290c;
+    --comment-border: #b8902a;
+    --comment-ring: #3a3012;
+    --comment-text: #f2d27a;
+    --mark: #5a4810;
+
+    --suggest: #4fae75;
+    --suggest-bg: #173123;
+    --add-bg: #15291d;
+    --add-text: #8fd6a8;
+    --del-bg: #33191a;
+    --del-text: #f0a493;
+    --danger: #ef7a5e;
+
+    --selection: #2c4a86;
+    --hover: #222428;
+    --code-bg: #202226;
+    --flash: #3a3012;
+
+    --alert-note: #8fb3f2;
+    --alert-tip: #6cc790;
+    --alert-important: #b79cf2;
+    --alert-warning: #e2b24a;
+    --alert-caution: #ef7a5e;
+
+    --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.5);
+    --shadow-card: 0 4px 14px rgb(0 0 0 / 0.3);
+  }
+}

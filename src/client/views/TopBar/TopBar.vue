@@ -8,6 +8,10 @@ defineProps<{
   /** Path the copy button copies, relative to where the CLI started. */
   copyablePath: string | null
   mode: 'read' | 'source'
+  showFiles: boolean
+  showComments: boolean
+  /** False in single-file mode, where there is no files panel. */
+  hasFiles: boolean
   readCount: number
   fileCount: number
   commentCount: number
@@ -18,11 +22,24 @@ const emit = defineEmits<{
   openPrompt: []
   openPalette: []
   copyPath: []
+  toggleFiles: []
+  toggleComments: []
 }>()
 </script>
 
 <template>
   <header class="topbar">
+    <button
+      v-if="hasFiles"
+      type="button"
+      class="btn-icon panel-toggle"
+      :aria-pressed="showFiles"
+      :aria-label="showFiles ? 'Hide files panel' : 'Show files panel'"
+      :title="`${showFiles ? 'Hide' : 'Show'} files (B)`"
+      @click="emit('toggleFiles')"
+    >
+      <Icon name="panel-left" :size="18" />
+    </button>
     <div class="brand">
       <svg
         width="22"
@@ -113,6 +130,16 @@ const emit = defineEmits<{
       Copy all prompt ({{ commentCount }})
       <kbd>P</kbd>
     </button>
+    <button
+      type="button"
+      class="btn-icon panel-toggle"
+      :aria-pressed="showComments"
+      :aria-label="showComments ? 'Hide comments panel' : 'Show comments panel'"
+      :title="`${showComments ? 'Hide' : 'Show'} comments (N)`"
+      @click="emit('toggleComments')"
+    >
+      <Icon name="panel-right" :size="18" />
+    </button>
   </header>
 </template>
 
@@ -125,6 +152,19 @@ const emit = defineEmits<{
   padding: 10px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+}
+
+.panel-toggle {
+  width: 36px;
+  height: 36px;
+}
+
+.panel-toggle[aria-pressed='true'] {
+  color: var(--text);
+}
+
+.panel-toggle[aria-pressed='false'] {
+  color: var(--text-faint);
 }
 
 .brand {

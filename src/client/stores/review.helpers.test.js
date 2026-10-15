@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   countByPath,
   newCommentId,
+  parsePrefs,
   parseState,
   readStatus,
   serializeState,
@@ -82,5 +83,24 @@ describe('newCommentId', () => {
   it('is short and differs with time and randomness', () => {
     expect(newCommentId(1000, 0.5)).not.toBe(newCommentId(1000, 0.6))
     expect(newCommentId(1000, 0.5)).not.toBe(newCommentId(2000, 0.5))
+  })
+})
+
+describe('parsePrefs', () => {
+  it('defaults to Read view with both panels shown', () => {
+    expect(parsePrefs(null)).toEqual({
+      mode: 'read',
+      includeQuotes: true,
+      showFiles: true,
+      showComments: true,
+    })
+  })
+
+  it('keeps valid stored values and drops the rest', () => {
+    expect(
+      parsePrefs(JSON.stringify({ mode: 'source', showFiles: false, showComments: 'no' })),
+    ).toEqual({ mode: 'source', includeQuotes: true, showFiles: false, showComments: true })
+    expect(parsePrefs('not json').showFiles).toBe(true)
+    expect(parsePrefs('null').mode).toBe('read')
   })
 })

@@ -1,14 +1,17 @@
 import { reactive, watch } from 'vue'
 import type { WorkspaceFile } from '../../shared/api.ts'
 import {
+  type Prefs,
   type ReviewComment,
   type ReviewState,
   newCommentId,
+  parsePrefs,
   parseState,
   serializeState,
   storageKey,
 } from './review.helpers.ts'
 
+export type { Prefs }
 export type ReviewStore = ReturnType<typeof createReviewStore>
 
 /**
@@ -84,26 +87,10 @@ function writeStorage(key: string, value: string): void {
   }
 }
 
-/** UI preferences shared by every workspace. */
-export interface Prefs {
-  mode: 'read' | 'source'
-  includeQuotes: boolean
-}
-
 const PREFS_KEY = 'mdifit:prefs'
 
 export function loadPrefs(): Prefs {
-  const defaults: Prefs = { mode: 'read', includeQuotes: true }
-  try {
-    const data = JSON.parse(readStorage(PREFS_KEY) ?? '{}') as Partial<Prefs>
-    return {
-      mode: data.mode === 'source' ? 'source' : defaults.mode,
-      includeQuotes:
-        typeof data.includeQuotes === 'boolean' ? data.includeQuotes : defaults.includeQuotes,
-    }
-  } catch {
-    return defaults
-  }
+  return parsePrefs(readStorage(PREFS_KEY))
 }
 
 export function savePrefs(prefs: Prefs): void {

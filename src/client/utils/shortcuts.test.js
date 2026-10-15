@@ -24,6 +24,8 @@ describe('matchShortcut', () => {
     expect(matchShortcut(key('v'))).toBe('toggleMode')
     expect(matchShortcut(key(']'))).toBe('nextFile')
     expect(matchShortcut(key('['))).toBe('previousFile')
+    expect(matchShortcut(key('b'))).toBe('toggleFiles')
+    expect(matchShortcut(key('n'))).toBe('toggleComments')
     expect(matchShortcut(key('?'))).toBe('help')
   })
 
@@ -36,7 +38,7 @@ describe('matchShortcut', () => {
 
   it('documents every action it handles', () => {
     const documented = new Set(SHORTCUTS.map((s) => s.action))
-    for (const k of ['c', 's', 'p', 'r', 'v', ']', '[', '?']) {
+    for (const k of ['c', 's', 'p', 'r', 'v', ']', '[', 'b', 'n', '?']) {
       expect(documented.has(matchShortcut(key(k)))).toBe(true)
     }
   })

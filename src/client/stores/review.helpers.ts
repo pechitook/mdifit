@@ -29,6 +29,41 @@ export interface ReviewState {
 
 export type ReadStatus = 'unread' | 'read' | 'edited'
 
+/** UI preferences shared by every workspace. */
+export interface Prefs {
+  mode: 'read' | 'source'
+  includeQuotes: boolean
+  /** Files sidebar on the left. */
+  showFiles: boolean
+  /** Comments rail on the right. */
+  showComments: boolean
+}
+
+export const DEFAULT_PREFS: Prefs = {
+  mode: 'read',
+  includeQuotes: true,
+  showFiles: true,
+  showComments: true,
+}
+
+/** Stored preferences, falling back to the default for anything missing or malformed. */
+export function parsePrefs(raw: string | null): Prefs {
+  let data: Partial<Record<keyof Prefs, unknown>> = {}
+  try {
+    data = (JSON.parse(raw ?? '{}') as typeof data | null) ?? {}
+  } catch {
+    // Keep the defaults.
+  }
+  const flag = (key: 'includeQuotes' | 'showFiles' | 'showComments') =>
+    typeof data[key] === 'boolean' ? data[key] : DEFAULT_PREFS[key]
+  return {
+    mode: data.mode === 'source' ? 'source' : 'read',
+    includeQuotes: flag('includeQuotes'),
+    showFiles: flag('showFiles'),
+    showComments: flag('showComments'),
+  }
+}
+
 export const STORAGE_VERSION = 1
 
 export function storageKey(rootPath: string): string {

@@ -9,6 +9,8 @@ export type ShortcutAction =
   | 'prompt'
   | 'nextFile'
   | 'previousFile'
+  | 'toggleFiles'
+  | 'toggleComments'
   | 'help'
 
 export interface Shortcut {
@@ -26,6 +28,8 @@ export const SHORTCUTS: Shortcut[] = [
   { action: 'toggleMode', keys: 'V', label: 'Switch Read / Source view' },
   { action: 'nextFile', keys: ']', label: 'Next file' },
   { action: 'previousFile', keys: '[', label: 'Previous file' },
+  { action: 'toggleFiles', keys: 'B', label: 'Show / hide the files panel' },
+  { action: 'toggleComments', keys: 'N', label: 'Show / hide the comments panel' },
   { action: 'help', keys: '?', label: 'Show shortcuts' },
 ]
 
@@ -57,6 +61,10 @@ export function matchShortcut(input: KeyInput): ShortcutAction | null {
       return 'nextFile'
     case '[':
       return 'previousFile'
+    case 'b':
+      return 'toggleFiles'
+    case 'n':
+      return 'toggleComments'
     case '?':
       return 'help'
     default:

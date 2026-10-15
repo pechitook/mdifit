@@ -51,6 +51,7 @@ const entryChoice = ref<Record<string, string>>({})
 
 const files = computed(() => workspace.value?.files ?? [])
 const promptBase = computed(() => workspace.value?.promptBase ?? '')
+const showFilesPanel = computed(() => prefs.value.showFiles && !workspace.value?.single)
 const comments = computed(() => store.value?.state.comments ?? [])
 const read = computed(() => store.value?.state.read ?? {})
 const commentCounts = computed(() => countByPath(comments.value))
@@ -246,6 +247,12 @@ function onKeydown(event: KeyboardEvent): void {
       if (path) navigate({ path, anchor: null })
       break
     }
+    case 'toggleFiles':
+      if (!workspace.value?.single) prefs.value.showFiles = !prefs.value.showFiles
+      break
+    case 'toggleComments':
+      prefs.value.showComments = !prefs.value.showComments
+      break
     case 'help':
       dialog.value = 'help'
       break
@@ -283,6 +290,9 @@ onBeforeUnmount(() => {
   <div v-else-if="workspace && store" class="shell">
     <TopBar
       v-model:mode="prefs.mode"
+      :show-files="prefs.showFiles"
+      :show-comments="prefs.showComments"
+      :has-files="!workspace.single"
       :crumbs="crumbs"
       :copyable-path="copyablePath"
       :read-count="readCount(files, read)"
@@ -291,11 +301,13 @@ onBeforeUnmount(() => {
       @open-prompt="dialog = 'prompt'"
       @open-palette="dialog = 'palette'"
       @copy-path="copyPath"
+      @toggle-files="prefs.showFiles = !prefs.showFiles"
+      @toggle-comments="prefs.showComments = !prefs.showComments"
     />
 
-    <div class="body" :class="{ single: workspace.single }">
+    <div class="body" :class="{ 'no-files': !showFilesPanel, 'no-comments': !prefs.showComments }">
       <Sidebar
-        v-if="!workspace.single"
+        v-if="showFilesPanel"
         :files="files"
         :read="read"
         :comment-counts="commentCounts"
@@ -345,6 +357,7 @@ onBeforeUnmount(() => {
       </main>
 
       <CommentsRail
+        v-if="prefs.showComments"
         :comments="comments"
         :current-path="viewPath"
         @open-prompt="dialog = 'prompt'"
@@ -384,8 +397,16 @@ onBeforeUnmount(() => {
   min-height: 0;
 }
 
-.body.single {
+.body.no-files {
   grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.body.no-comments {
+  grid-template-columns: 290px minmax(0, 1fr);
+}
+
+.body.no-files.no-comments {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .placeholder {
@@ -421,22 +442,25 @@ onBeforeUnmount(() => {
   box-shadow: var(--shadow-pop);
 }
 
+/* Narrow windows drop the comments panel, then the files panel, whatever the toggles say. */
 @media (max-width: 1100px) {
-  .body {
+  .body,
+  .body.no-comments {
     grid-template-columns: 250px minmax(0, 1fr);
+  }
+
+  .body.no-files {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .body > .rail {
     display: none;
   }
-
-  .body.single {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 @media (max-width: 720px) {
-  .body {
+  .body,
+  .body.no-comments {
     grid-template-columns: minmax(0, 1fr);
   }
 

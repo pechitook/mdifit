@@ -4,7 +4,7 @@ Read a folder of Markdown in your browser, comment while you read, and copy the 
 review as a prompt for your coding agent.
 
 ```bash
-npx mdifit plans/
+npx mdifit docs/
 ```
 
 Agents write more and more of their work to disk as Markdown: plans, specs, reports,
@@ -13,12 +13,12 @@ Markdown reader, lets you comment on any line, range or phrase as you read, and 
 comments into text an agent can act on:
 
 ```
-plans/release-plan.md:L24-L25
-> enable the reconciliation mechanism first on GrokBot
-Add a rollback criterion if GrokBot does not confirm within 48 h.
+docs/architecture/queue-migration.md:L25-L26
+> move email confirmations first and payment capture last
+Add a rollback criterion if the email worker lags more than 5 minutes.
 =====
-plans/validation.md:L12
-What counts as "confirmed"? The heartbeat or the guide.applied event?
+docs/architecture/rollout-checks.md:L12
+What counts as "processed"? The ack, or the row in processed_events?
 ```
 
 The format is the same as [difit](https://github.com/yoshiko-pg/difit)'s, so it pastes the

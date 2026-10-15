@@ -96,7 +96,7 @@ Each diagram has a Diagram / Code switch and a full-size view.
 ### From a selection to `file:L24-L25`
 
 1. `utils/dom.ts#readSelection` snaps the selection to whole words (`utils/textRange.ts`:
-   "lo también…" becomes "Pablo también…", and the visible selection follows), then finds
+   "is también…" becomes "Redis también…", and the visible selection follows), then finds
    the closest `[data-line-start]` of both ends (only inside `[data-doc]` text) → the block
    range.
 2. In the Read view `utils/quote.ts#locateQuote` narrows it: it strips Markdown markup from
@@ -138,18 +138,18 @@ keeps them understandable.
 `utils/prompt.ts` is difit's format, so both tools paste the same way:
 
 ~~~
-plans/release-plan.md:L24-L25
-> enable the reconciliation mechanism first on GrokBot
-Add a rollback criterion if GrokBot does not confirm within 48 h.
+docs/architecture/queue-migration.md:L25-L26
+> move email confirmations first and payment capture last
+Add a rollback criterion if the email worker lags more than 5 minutes.
 =====
-plans/release-plan.md:L61
+docs/architecture/queue-migration.md:L61
 ORIGINAL:
 ```
-50 agents per release
+50 messages per second per consumer
 ```
 SUGGESTED:
 ```
-20 agents per batch
+20 messages per second per consumer
 ```
 ~~~
 

@@ -37,6 +37,9 @@ A component used by two views moves to `components/ui/`. Nothing goes there in a
 3. Rendered Markdown is split into top-level blocks that carry `data-line-start/end`;
    selections map to lines through those attributes and `utils/quote.ts`.
 4. Only text marked `data-doc` is commentable (never comment cards or the composer).
-5. Single-key shortcuts never fire while typing; the key map lives in `utils/shortcuts.ts`
+5. **The Read view stays calm**: no line numbers, no yellow, nothing that takes vertical
+   space. Comments are highlights (CSS Custom Highlight API, never DOM rewrites) plus margin
+   bubbles; composers are popovers. Line numbers belong to the Source view and the prompt.
+6. Single-key shortcuts never fire while typing; the key map lives in `utils/shortcuts.ts`
    so the help dialog and the handler agree.
-6. Accessible as built: real buttons and links, labels on inputs, `aria-label` on icon buttons.
+7. Accessible as built: real buttons and links, labels on inputs, `aria-label` on icon buttons.

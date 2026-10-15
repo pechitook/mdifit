@@ -24,3 +24,7 @@ All notable changes to this project are documented here. The format follows
   switch, a full-size view and comments on node labels.
 - Buttons and shortcuts (B, N) to show or hide the files and comments panels, remembered
   across sessions.
+- Calm reading view: no line numbers, comments as a soft underline plus a bubble in the
+  margin, composer and opened comments in a popover beside the text, suggested edits
+  previewed inline. Neutral colors instead of yellow.
+- Selections snap to whole words.

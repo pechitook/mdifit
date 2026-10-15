@@ -95,13 +95,34 @@ Each diagram has a Diagram / Code switch and a full-size view.
 
 ### From a selection to `file:L24-L25`
 
-1. `utils/dom.ts#readSelection` finds the closest `[data-line-start]` of both ends of the
-   selection (only inside `[data-doc]` text) → the block range.
+1. `utils/dom.ts#readSelection` snaps the selection to whole words (`utils/textRange.ts`:
+   "lo también…" becomes "Pablo también…", and the visible selection follows), then finds
+   the closest `[data-line-start]` of both ends (only inside `[data-doc]` text) → the block
+   range.
 2. In the Read view `utils/quote.ts#locateQuote` narrows it: it strips Markdown markup from
    the source lines of the block, joins them, finds the selected text and maps it back to
    the lines it spans. The Source view already has exact lines.
 3. The draft keeps the quote. Suggested edits keep the quote as the original and the
    replacement next to it.
+
+### Comments in the Read view
+
+The Read view has no line numbers and never pushes the text around for a comment:
+
+- A comment is a **mark** on its quote plus a **bubble** in the page's right gutter.
+  `views/Reader/marks.ts` finds the quote again in the rendered text
+  (`locateInSegments`, whitespace-insensitive) and paints it with the CSS Custom Highlight
+  API, so the rendered HTML is never rewritten. Comments without a quote (made with the
+  block's `+`) anchor to their block. Overlapping bubbles stack (`stackMarkers`).
+- Writing, editing and opening a comment happen in a **popover** (`MarginComposer`,
+  `MarginComment`). `placePopover` puts it beside the text when the window has room and
+  under the anchor line otherwise. An opened comment walks the file's comments with ‹ ›.
+- A suggested edit strikes the original (a highlight) and shows the replacement right
+  after it as a temporary `<ins>`, removed when the draft closes.
+- Everything is recomputed on render, comment changes, resize and the page's own size
+  changes (a `ResizeObserver`, which also catches diagrams finishing).
+
+The Source view keeps line numbers and shows comments inline under their line.
 
 ### Comments and progress
 

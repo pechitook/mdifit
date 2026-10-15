@@ -1,0 +1,65 @@
+{
+  "name": "mdifit",
+  "version": "0.1.0",
+  "description": "Read a folder of Markdown, comment while you read, and copy your review as a prompt for your coding agent.",
+  "keywords": [
+    "agent",
+    "ai",
+    "cli",
+    "comments",
+    "llm",
+    "markdown",
+    "prompt",
+    "review"
+  ],
+  "license": "MIT",
+  "author": "Pablo Chiappetti",
+  "bin": {
+    "mdifit": "dist/node/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "npm run build:client && npm run build:node",
+    "build:client": "vite build",
+    "build:node": "tsc -p tsconfig.json",
+    "start": "node dist/node/cli/index.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit && vue-tsc -p src/client/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test",
+    "prepublishOnly": "npm run check && npm run build"
+  },
+  "dependencies": {
+    "@hono/node-server": "2.1.5",
+    "hono": "4.13.13"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@types/markdown-it": "14.2.0",
+    "@types/node": "24.19.2",
+    "@vitejs/plugin-vue": "6.0.10",
+    "highlight.js": "11.12.0",
+    "markdown-it": "15.0.2",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.88.0",
+    "typescript": "6.0.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.5",
+    "vue": "3.5.44",
+    "vue-tsc": "3.3.13"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

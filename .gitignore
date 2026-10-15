@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+.env
+.env.local
+.scratch/
+.codegraph/
+CLAUDE.local.md
+.claude/settings.local.json

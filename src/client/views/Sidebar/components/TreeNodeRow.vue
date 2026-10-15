@@ -10,6 +10,8 @@ defineProps<{
   node: TreeNode
   depth: number
   currentPath: string | null
+  /** Folder route on screen (`plans/`), to highlight its row. */
+  currentFolder: string | null
   collapsed: Set<string>
   /** Outline of the open file, shown under it. */
   headings: OutlineHeading[]
@@ -21,20 +23,31 @@ const emit = defineEmits<{ toggle: [path: string] }>()
 <template>
   <li class="node">
     <template v-if="node.kind === 'folder'">
-      <button
-        type="button"
+      <div
         class="row folder"
-        :style="{ paddingLeft: `${8 + depth * 14}px` }"
-        :aria-expanded="!collapsed.has(node.path)"
-        @click="emit('toggle', node.path)"
+        :class="{ active: `${node.path}/` === currentFolder }"
+        :style="{ paddingLeft: `${4 + depth * 14}px` }"
       >
-        <Icon
-          :name="collapsed.has(node.path) ? 'chevron-right' : 'chevron-down'"
-          :size="14"
-          :stroke-width="2.4"
-        />
-        <span class="name">{{ node.name }}</span>
-      </button>
+        <button
+          type="button"
+          class="chevron"
+          :aria-expanded="!collapsed.has(node.path)"
+          :aria-label="`${collapsed.has(node.path) ? 'Expand' : 'Collapse'} ${node.name}`"
+          @click="emit('toggle', node.path)"
+        >
+          <Icon
+            :name="collapsed.has(node.path) ? 'chevron-right' : 'chevron-down'"
+            :size="14"
+            :stroke-width="2.4"
+          />
+        </button>
+        <a
+          class="name"
+          :href="formatHash({ path: `${node.path}/`, anchor: null })"
+          :aria-current="`${node.path}/` === currentFolder ? 'page' : undefined"
+          >{{ node.name }}</a
+        >
+      </div>
       <ul v-if="!collapsed.has(node.path)" class="children">
         <TreeNodeRow
           v-for="child in node.children"
@@ -42,6 +55,7 @@ const emit = defineEmits<{ toggle: [path: string] }>()
           :node="child"
           :depth="depth + 1"
           :current-path="currentPath"
+          :current-folder="currentFolder"
           :collapsed="collapsed"
           :headings="headings"
           @toggle="emit('toggle', $event)"
@@ -116,8 +130,40 @@ const emit = defineEmits<{ toggle: [path: string] }>()
 }
 
 .folder {
+  gap: 2px;
   color: var(--text-muted);
   font-weight: 500;
+}
+
+.folder .name {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.folder.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chevron {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+}
+
+.chevron:hover {
+  background: var(--border);
 }
 
 .file.active {

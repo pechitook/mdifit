@@ -225,6 +225,10 @@ defineExpose({ startFromSelection })
       @mouseup="captureSelection"
       @keyup.shift="captureSelection"
     >
+      <div v-if="$slots.before" class="before">
+        <slot name="before" />
+      </div>
+
       <ReadView v-if="mode === 'read'" :blocks="rendered.blocks" @add-at="addAtBlock">
         <template #after="{ block }">
           <CommentCard
@@ -323,6 +327,10 @@ defineExpose({ startFromSelection })
 
 .page.source {
   max-width: 1040px;
+}
+
+.before {
+  margin-left: 56px;
 }
 
 .empty {

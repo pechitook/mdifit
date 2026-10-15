@@ -11,6 +11,7 @@ const props = defineProps<{
   read: Record<string, number>
   commentCounts: Map<string, number>
   currentPath: string | null
+  currentFolder: string | null
   headings: OutlineHeading[]
 }>()
 
@@ -71,6 +72,7 @@ function toggle(path: string): void {
         :node="node"
         :depth="0"
         :current-path="currentPath"
+        :current-folder="currentFolder"
         :collapsed="collapsed"
         :headings="headings"
         @toggle="toggle"

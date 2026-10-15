@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatHash, lineAnchor, parseHash } from './route.ts'
+import { folderOf, formatHash, isFolderPath, lineAnchor, parseHash } from './route.ts'
 
 describe('parseHash', () => {
   it('reads the path and the anchor', () => {
@@ -17,7 +17,12 @@ describe('parseHash', () => {
   it('is empty for anything that is not a route', () => {
     expect(parseHash('')).toEqual({ path: null, anchor: null })
     expect(parseHash('#scope')).toEqual({ path: null, anchor: null })
-    expect(parseHash('#/')).toEqual({ path: null, anchor: null })
+  })
+
+  it('reads folders, the root included', () => {
+    expect(parseHash('#/')).toEqual({ path: '', anchor: null })
+    expect(parseHash('#/plans/openclaw/')).toEqual({ path: 'plans/openclaw/', anchor: null })
+    expect(parseHash('#/plans/#scope')).toEqual({ path: 'plans/', anchor: 'scope' })
   })
 })
 
@@ -30,6 +35,8 @@ describe('formatHash', () => {
   it('omits a missing anchor and is empty without a path', () => {
     expect(formatHash({ path: 'a.md', anchor: null })).toBe('#/a.md')
     expect(formatHash({ path: null, anchor: 'x' })).toBe('')
+    expect(formatHash({ path: '', anchor: null })).toBe('#/')
+    expect(formatHash({ path: 'my notes/', anchor: null })).toBe('#/my%20notes/')
   })
 })
 
@@ -39,5 +46,19 @@ describe('lineAnchor', () => {
     expect(lineAnchor('scope')).toBeNull()
     expect(lineAnchor('L')).toBeNull()
     expect(lineAnchor(null)).toBeNull()
+  })
+})
+
+describe('folders', () => {
+  it('tells folder paths from file paths', () => {
+    expect(isFolderPath('')).toBe(true)
+    expect(isFolderPath('plans/')).toBe(true)
+    expect(isFolderPath('plans/a.md')).toBe(false)
+    expect(isFolderPath(null)).toBe(false)
+  })
+
+  it('finds the folder of a file', () => {
+    expect(folderOf('plans/openclaw/a.md')).toBe('plans/openclaw/')
+    expect(folderOf('a.md')).toBe('')
   })
 })

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import type { FileResponse, WorkspaceResponse } from '../shared/api.ts'
-import { adjacentPath, defaultPath, nextUnreadPath, readCount } from './App.helpers.ts'
+import { adjacentPath, nextUnreadPath, readCount } from './App.helpers.ts'
 import { ApiError, getFile, getWorkspace, subscribeChanges } from './services/api.ts'
 import {
   type Prefs,
@@ -13,17 +13,21 @@ import {
 import { countByPath, readStatus } from './stores/review.helpers.ts'
 import { copyText, isEditingTarget } from './utils/dom.ts'
 import { renderMarkdown } from './utils/markdown.ts'
-import { type Route, formatHash, parseHash } from './utils/route.ts'
+import { type Route, folderOf, formatHash, isFolderPath, parseHash } from './utils/route.ts'
 import { matchShortcut } from './utils/shortcuts.ts'
 import { pluralize } from './utils/text.ts'
 import type { PaletteItem } from './views/CommandPalette/CommandPalette.helpers.ts'
 import CommandPalette from './views/CommandPalette/CommandPalette.vue'
 import CommentsRail from './views/CommentsRail/CommentsRail.vue'
+import { folderEntries, folderExists, listFolder } from './views/Folder/Folder.helpers.ts'
+import FolderStrip from './views/Folder/FolderStrip.vue'
+import FolderView from './views/Folder/FolderView.vue'
 import PromptDialog from './views/PromptDialog/PromptDialog.vue'
 import Reader from './views/Reader/Reader.vue'
 import ShortcutsDialog from './views/ShortcutsDialog/ShortcutsDialog.vue'
 import { buildTree, flattenFiles } from './views/Sidebar/Sidebar.helpers.ts'
 import Sidebar from './views/Sidebar/Sidebar.vue'
+import { type Crumb, breadcrumbs } from './views/TopBar/TopBar.helpers.ts'
 import TopBar from './views/TopBar/TopBar.vue'
 
 /**
@@ -42,8 +46,11 @@ const fileError = ref<string | null>(null)
 const toast = ref<string | null>(null)
 const dialog = ref<'prompt' | 'palette' | 'help' | null>(null)
 const reader = ref<InstanceType<typeof Reader> | null>(null)
+/** Folder → entry file picked by hand when a folder has README and AGENTS. */
+const entryChoice = ref<Record<string, string>>({})
 
 const files = computed(() => workspace.value?.files ?? [])
+const promptBase = computed(() => workspace.value?.promptBase ?? '')
 const comments = computed(() => store.value?.state.comments ?? [])
 const read = computed(() => store.value?.state.read ?? {})
 const commentCounts = computed(() => countByPath(comments.value))
@@ -52,7 +59,32 @@ const treeOrder = computed(() =>
     buildTree({ files: files.value, read: {}, commentCounts: new Map(), filter: 'all', query: '' }),
   ).map((node) => node.path),
 )
-const currentFile = computed(() => files.value.find((f) => f.path === route.value.path) ?? null)
+/** The folder route on screen (`plans/`, root `''`), or `null` on a file route. */
+const folder = computed(() => (isFolderPath(route.value.path) ? route.value.path : null))
+const entries = computed(() =>
+  folder.value === null ? [] : folderEntries(files.value, folder.value),
+)
+/** The file on screen: the routed file, or the README / AGENTS.md a folder opens with. */
+const viewPath = computed(() => {
+  if (folder.value === null) return route.value.path
+  const chosen = entryChoice.value[folder.value]
+  return chosen && entries.value.includes(chosen) ? chosen : (entries.value[0] ?? null)
+})
+const listing = computed(() =>
+  folder.value === null
+    ? null
+    : listFolder(files.value, folder.value, read.value, commentCounts.value),
+)
+const crumbs = computed<Crumb[]>(() => {
+  const name = workspace.value?.name ?? ''
+  if (workspace.value?.single) return [{ label: name, path: viewPath.value ?? '', current: true }]
+  return breadcrumbs(name, folder.value, viewPath.value)
+})
+const copyablePath = computed(() => {
+  const path = viewPath.value ?? folder.value
+  return path === null ? null : `${promptBase.value}${path}` || './'
+})
+const currentFile = computed(() => files.value.find((f) => f.path === viewPath.value) ?? null)
 const rendered = computed(() =>
   file.value ? renderMarkdown(file.value.source, file.value.path) : null,
 )
@@ -61,9 +93,8 @@ const status = computed(() =>
   currentFile.value ? readStatus(currentFile.value, read.value) : 'unread',
 )
 const nextPath = computed(() =>
-  nextUnreadPath(treeOrder.value, files.value, read.value, route.value.path),
+  nextUnreadPath(treeOrder.value, files.value, read.value, viewPath.value),
 )
-const promptBase = computed(() => workspace.value?.promptBase ?? '')
 
 watch(prefs, savePrefs, { deep: true })
 
@@ -76,14 +107,30 @@ async function loadWorkspace(): Promise<void> {
       store.value = createReviewStore(next.rootPath)
     workspace.value = next
     error.value = null
-    if (!route.value.path || !next.files.some((f) => f.path === route.value.path)) {
-      const fallback = defaultPath(next.files, treeOrder.value)
-      if (fallback && fallback !== route.value.path)
-        navigate({ path: fallback, anchor: null }, true)
-    }
+    redirectIfMissing(next)
   } catch (e) {
     error.value = e instanceof ApiError ? e.message : String(e)
   }
+}
+
+/** Sends a route that points nowhere to the closest folder that exists. */
+function redirectIfMissing(next: WorkspaceResponse): void {
+  const path = route.value.path
+  if (next.single) {
+    const only = next.files[0]?.path
+    if (only && path !== only) navigate({ path: only, anchor: null }, true)
+    return
+  }
+  if (path === null) {
+    navigate({ path: '', anchor: null }, true)
+    return
+  }
+  const exists = isFolderPath(path)
+    ? folderExists(next.files, path)
+    : next.files.some((f) => f.path === path)
+  if (exists) return
+  const parent = isFolderPath(path) ? '' : folderOf(path)
+  navigate({ path: folderExists(next.files, parent) ? parent : '', anchor: null }, true)
 }
 
 let loadToken = 0
@@ -102,9 +149,14 @@ async function loadFile(path: string): Promise<void> {
 }
 
 watch(
-  () => route.value.path,
+  viewPath,
   (path) => {
     if (path) void loadFile(path)
+    else {
+      file.value = null
+      fileError.value = null
+      document.title = `${folder.value || workspace.value?.name || ''} · mdifit`
+    }
   },
   { immediate: true },
 )
@@ -118,6 +170,7 @@ function navigate(next: Route, replace = false): void {
 
 function onHashChange(): void {
   route.value = parseHash(location.hash)
+  if (workspace.value) redirectIfMissing(workspace.value)
 }
 
 // --- review actions ----------------------------------------------------------
@@ -136,8 +189,11 @@ function onCopied(count: number, ids: string[], clear: boolean): void {
 }
 
 async function copyPath(): Promise<void> {
-  if (route.value.path && (await copyText(`${promptBase.value}${route.value.path}`)))
-    showToast('Path copied')
+  if (copyablePath.value && (await copyText(copyablePath.value))) showToast('Path copied')
+}
+
+function chooseEntry(path: string): void {
+  if (folder.value !== null) entryChoice.value = { ...entryChoice.value, [folder.value]: path }
 }
 
 function go(item: PaletteItem): void {
@@ -186,7 +242,7 @@ function onKeydown(event: KeyboardEvent): void {
       break
     case 'nextFile':
     case 'previousFile': {
-      const path = adjacentPath(treeOrder.value, route.value.path, action === 'nextFile' ? 1 : -1)
+      const path = adjacentPath(treeOrder.value, viewPath.value, action === 'nextFile' ? 1 : -1)
       if (path) navigate({ path, anchor: null })
       break
     }
@@ -206,7 +262,7 @@ onMounted(() => {
   void loadWorkspace()
   unsubscribe = subscribeChanges((path) => {
     void loadWorkspace()
-    if (path === route.value.path) void loadFile(path)
+    if (path === viewPath.value) void loadFile(path)
   })
 })
 
@@ -227,8 +283,8 @@ onBeforeUnmount(() => {
   <div v-else-if="workspace && store" class="shell">
     <TopBar
       v-model:mode="prefs.mode"
-      :workspace-name="workspace.name"
-      :display-path="route.path ? `${promptBase}${route.path}` : null"
+      :crumbs="crumbs"
+      :copyable-path="copyablePath"
       :read-count="readCount(files, read)"
       :file-count="files.length"
       :comment-count="comments.length"
@@ -243,12 +299,13 @@ onBeforeUnmount(() => {
         :files="files"
         :read="read"
         :comment-counts="commentCounts"
-        :current-path="route.path"
+        :current-path="viewPath"
+        :current-folder="folder"
         :headings="rendered?.headings ?? []"
       />
 
       <Reader
-        v-if="file && rendered && file.path === route.path"
+        v-if="file && rendered && file.path === viewPath"
         ref="reader"
         :file="file"
         :rendered="rendered"
@@ -263,6 +320,23 @@ onBeforeUnmount(() => {
         @remove="store.removeComment($event)"
         @toggle-read="toggleRead"
         @toast="showToast"
+      >
+        <template v-if="folder !== null && listing" #before>
+          <FolderStrip
+            :folder="folder"
+            :root-name="workspace.name"
+            :listing="listing"
+            :entries="entries"
+            :entry="file.path"
+            @choose-entry="chooseEntry"
+          />
+        </template>
+      </Reader>
+      <FolderView
+        v-else-if="folder !== null && viewPath === null && listing"
+        :folder="folder"
+        :root-name="workspace.name"
+        :listing="listing"
       />
       <main v-else class="placeholder">
         <p v-if="fileError" role="alert">{{ fileError }}</p>
@@ -272,7 +346,7 @@ onBeforeUnmount(() => {
 
       <CommentsRail
         :comments="comments"
-        :current-path="route.path"
+        :current-path="viewPath"
         @open-prompt="dialog = 'prompt'"
         @clear="store.clearComments($event)"
       />
@@ -282,7 +356,7 @@ onBeforeUnmount(() => {
       v-model:include-quotes="prefs.includeQuotes"
       :open="dialog === 'prompt'"
       :comments="comments"
-      :current-path="route.path"
+      :current-path="viewPath"
       :prompt-base="promptBase"
       @close="dialog = null"
       @copied="onCopied"

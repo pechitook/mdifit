@@ -1,15 +1,7 @@
 import type { WorkspaceFile } from '../shared/api.ts'
 import { readStatus } from './stores/review.helpers.ts'
 
-/** Shell rules: which file opens first, what "next" means, progress. */
-
-const ENTRY_NAMES = ['readme.md', 'index.md', 'readme.markdown']
-
-/** A root README opens first; otherwise the first file in tree order. */
-export function defaultPath(files: WorkspaceFile[], treeOrder: string[]): string | null {
-  const entry = files.find((file) => ENTRY_NAMES.includes(file.path.toLowerCase()))
-  return entry?.path ?? treeOrder[0] ?? files[0]?.path ?? null
-}
+/** Shell rules: what "next" means, progress. */
 
 /** The file `delta` steps away in tree order, without wrapping. */
 export function adjacentPath(

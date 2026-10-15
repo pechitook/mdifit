@@ -1,19 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { adjacentPath, defaultPath, nextUnreadPath, readCount } from './App.helpers.ts'
+import { adjacentPath, nextUnreadPath, readCount } from './App.helpers.ts'
 
 const file = (path, mtimeMs = 100) => ({ path, title: null, mtimeMs, size: 1 })
-
-describe('defaultPath', () => {
-  it('opens a root README first', () => {
-    const files = [file('a/b.md'), file('README.md')]
-    expect(defaultPath(files, ['a/b.md', 'README.md'])).toBe('README.md')
-  })
-
-  it('falls back to tree order, then to nothing', () => {
-    expect(defaultPath([file('z.md'), file('docs/a.md')], ['docs/a.md', 'z.md'])).toBe('docs/a.md')
-    expect(defaultPath([], [])).toBeNull()
-  })
-})
 
 describe('adjacentPath', () => {
   const order = ['a.md', 'b.md', 'c.md']

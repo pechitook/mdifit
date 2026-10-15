@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import Icon from '../../components/ui/Icon.vue'
+import { formatHash } from '../../utils/route.ts'
+import type { Crumb } from './TopBar.helpers.ts'
 
 defineProps<{
-  workspaceName: string
-  /** `plans/agent-kit/release.md`, relative to where the CLI started. */
-  displayPath: string | null
+  crumbs: Crumb[]
+  /** Path the copy button copies, relative to where the CLI started. */
+  copyablePath: string | null
   mode: 'read' | 'source'
   readCount: number
   fileCount: number
@@ -40,16 +42,30 @@ const emit = defineEmits<{
       mdifit
     </div>
 
-    <nav class="path" aria-label="Current file">
-      <span class="path-text" :title="displayPath ?? workspaceName">{{
-        displayPath ?? workspaceName
-      }}</span>
+    <nav class="path" aria-label="Breadcrumb">
+      <ol>
+        <li v-for="crumb in crumbs" :key="crumb.path">
+          <span v-if="crumb.current" class="crumb current" aria-current="page" :title="crumb.label">
+            {{ crumb.label }}
+          </span>
+          <template v-else>
+            <a
+              class="crumb"
+              :href="formatHash({ path: crumb.path, anchor: null })"
+              :title="crumb.label"
+            >
+              {{ crumb.label }}
+            </a>
+            <Icon name="chevron-right" :size="14" class="sep" />
+          </template>
+        </li>
+      </ol>
       <button
-        v-if="displayPath"
+        v-if="copyablePath"
         type="button"
         class="btn-icon"
-        aria-label="Copy file path"
-        title="Copy file path"
+        :aria-label="`Copy path ${copyablePath}`"
+        :title="`Copy ${copyablePath}`"
         @click="emit('copyPath')"
       >
         <Icon name="copy" />
@@ -126,15 +142,52 @@ const emit = defineEmits<{
   align-items: center;
   gap: 4px;
   min-width: 0;
-  font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-muted);
 }
 
-.path-text {
+ol {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* Earlier crumbs give up space first, so the file name stays readable. */
+li:not(:last-child) {
+  flex-shrink: 3;
+}
+
+.crumb {
   overflow: hidden;
+  padding: 3px 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  text-decoration: none;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+a.crumb:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.crumb.current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.sep {
+  flex: none;
+  color: var(--text-faint);
 }
 
 .progress {

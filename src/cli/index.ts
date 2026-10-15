@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import os from 'node:os'
 import path from 'node:path'
 import { serve } from '@hono/node-server'
 import { createApp } from '../server/app.ts'
@@ -33,7 +34,11 @@ async function main(argv: string[]): Promise<number> {
   const fileCount = (await listFiles(config)).length
 
   const server = serve({ fetch: app.fetch, port, hostname: '127.0.0.1' }, () => {
-    const shown = path.relative(process.cwd(), config.target) || '.'
+    const relative = path.relative(process.cwd(), config.target)
+    // Far-away folders read better as ~/… than as a long climb of ../
+    const shown = relative.startsWith('..')
+      ? config.target.replace(os.homedir(), '~')
+      : relative || '.'
     console.log(
       [
         '',

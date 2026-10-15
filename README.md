@@ -1,11 +1,28 @@
-# mdifit
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/logo-dark.png">
+    <img src="docs/images/logo-light.png" alt="mdifit" width="280">
+  </picture>
+</h1>
 
-Read a folder of Markdown in your browser, comment while you read, and copy the whole
-review as a prompt for your coding agent.
+<p align="center">
+  Read a folder of Markdown in your browser, comment while you read,<br>
+  and copy the whole review as a prompt for your coding agent.
+</p>
+
+<p align="center">
+  <a href="https://github.com/pechitook/mdifit/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/pechitook/mdifit/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-1e2023"></a>
+</p>
 
 ```bash
 npx mdifit docs/
 ```
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
+  <img src="docs/images/screenshot-light.png" alt="mdifit showing an architecture plan: a phrase is underlined, a bubble sits in the margin, and the comment is open beside the text">
+</picture>
 
 Agents write more and more of their work to disk as Markdown: plans, specs, reports,
 notes. mdifit is the reviewing side of that loop. It renders the folder like a good

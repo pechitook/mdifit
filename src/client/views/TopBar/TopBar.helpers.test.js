@@ -3,17 +3,17 @@ import { breadcrumbs } from './TopBar.helpers.ts'
 
 describe('breadcrumbs', () => {
   it('walks from the root to the file', () => {
-    expect(breadcrumbs('plans', null, 'openclaw/AGENTS.md')).toEqual([
+    expect(breadcrumbs('plans', null, 'queue/AGENTS.md')).toEqual([
       { label: 'plans', path: '', current: false },
-      { label: 'openclaw', path: 'openclaw/', current: false },
-      { label: 'AGENTS.md', path: 'openclaw/AGENTS.md', current: true },
+      { label: 'queue', path: 'queue/', current: false },
+      { label: 'AGENTS.md', path: 'queue/AGENTS.md', current: true },
     ])
   })
 
   it('ends at the README a folder opened with', () => {
-    expect(breadcrumbs('plans', 'openclaw/', 'openclaw/README.md').map((c) => c.label)).toEqual([
+    expect(breadcrumbs('plans', 'queue/', 'queue/README.md').map((c) => c.label)).toEqual([
       'plans',
-      'openclaw',
+      'queue',
       'README.md',
     ])
   })

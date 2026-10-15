@@ -21,7 +21,7 @@ describe('parseHash', () => {
 
   it('reads folders, the root included', () => {
     expect(parseHash('#/')).toEqual({ path: '', anchor: null })
-    expect(parseHash('#/plans/openclaw/')).toEqual({ path: 'plans/openclaw/', anchor: null })
+    expect(parseHash('#/plans/queue/')).toEqual({ path: 'plans/queue/', anchor: null })
     expect(parseHash('#/plans/#scope')).toEqual({ path: 'plans/', anchor: 'scope' })
   })
 })
@@ -58,7 +58,7 @@ describe('folders', () => {
   })
 
   it('finds the folder of a file', () => {
-    expect(folderOf('plans/openclaw/a.md')).toBe('plans/openclaw/')
+    expect(folderOf('plans/queue/a.md')).toBe('plans/queue/')
     expect(folderOf('a.md')).toBe('')
   })
 })

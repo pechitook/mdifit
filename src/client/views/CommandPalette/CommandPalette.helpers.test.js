@@ -11,8 +11,8 @@ const file = (path, title = null) => ({ path, title, mtimeMs: 1, size: 1 })
 
 describe('fuzzyScore', () => {
   it('matches characters in order and rejects otherwise', () => {
-    expect(fuzzyScore('rpl', 'plans/release-plan.md')).not.toBeNull()
-    expect(fuzzyScore('xyz', 'plans/release-plan.md')).toBeNull()
+    expect(fuzzyScore('rpl', 'plans/rollout-plan.md')).not.toBeNull()
+    expect(fuzzyScore('xyz', 'plans/rollout-plan.md')).toBeNull()
   })
 
   it('prefers matches in the file name and consecutive runs', () => {

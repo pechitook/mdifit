@@ -63,7 +63,7 @@ describe('resolveInside', () => {
 describe('promptBaseFor', () => {
   it('is relative to the folder the CLI started in', () => {
     expect(promptBaseFor('/repo', '/repo/plans')).toBe('plans/')
-    expect(promptBaseFor('/repo', '/repo/plans/agent-kit')).toBe('plans/agent-kit/')
+    expect(promptBaseFor('/repo', '/repo/plans/orders')).toBe('plans/orders/')
   })
 
   it('is empty when the root is the current folder', () => {

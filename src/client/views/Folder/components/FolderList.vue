@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Icon from '../../../components/ui/Icon.vue'
 import { formatHash } from '../../../utils/route.ts'
-import { pluralize } from '../../../utils/text.ts'
-import { type FolderListing, formatAge } from '../Folder.helpers.ts'
+import { formatAge, pluralize } from '../../../utils/text.ts'
+import type { FolderListing } from '../Folder.helpers.ts'
 
 defineProps<{ listing: FolderListing; now: number }>()
 </script>

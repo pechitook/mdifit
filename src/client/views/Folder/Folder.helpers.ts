@@ -95,18 +95,6 @@ export function listFolder(
   return { folders: [...folders.values()].toSorted(byName), files: direct.toSorted(byName) }
 }
 
-/** `just now`, `5 min ago`, `3 h ago`, `2 d ago`, then the date. */
-export function formatAge(mtimeMs: number, now: number): string {
-  const minutes = Math.floor((now - mtimeMs) / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes} min ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours} h ago`
-  const days = Math.floor(hours / 24)
-  if (days < 14) return `${days} d ago`
-  return new Date(mtimeMs).toISOString().slice(0, 10)
-}
-
 /** The folder's own name: `plans/openclaw/` → `openclaw`; the root uses `rootName`. */
 export function folderName(folder: string, rootName: string): string {
   return folder === '' ? rootName : (folder.slice(0, -1).split('/').at(-1) ?? rootName)

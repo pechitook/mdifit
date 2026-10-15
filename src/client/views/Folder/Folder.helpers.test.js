@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { folderEntries, folderExists, folderName, formatAge, listFolder } from './Folder.helpers.ts'
+import { folderEntries, folderExists, folderName, listFolder } from './Folder.helpers.ts'
 
 const file = (path, overrides = {}) => ({ path, title: null, mtimeMs: 100, size: 1, ...overrides })
 
@@ -56,17 +56,6 @@ describe('listFolder', () => {
     const listing = listFolder(files, '', {}, new Map())
     expect(listing.folders.map((f) => [f.name, f.files])).toEqual([['plans', 5]])
     expect(listing.files.map((f) => f.name)).toEqual(['README.md'])
-  })
-})
-
-describe('formatAge', () => {
-  const now = Date.UTC(2026, 9, 15, 12)
-  it('reads like a person would say it', () => {
-    expect(formatAge(now - 10_000, now)).toBe('just now')
-    expect(formatAge(now - 5 * 60_000, now)).toBe('5 min ago')
-    expect(formatAge(now - 3 * 3_600_000, now)).toBe('3 h ago')
-    expect(formatAge(now - 2 * 86_400_000, now)).toBe('2 d ago')
-    expect(formatAge(Date.UTC(2026, 0, 2), now)).toBe('2026-01-02')
   })
 })
 

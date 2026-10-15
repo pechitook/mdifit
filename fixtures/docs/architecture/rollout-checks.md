@@ -1,22 +1,22 @@
-# Validation plan
+# Rollout checks
 
 Evidence required before enabling each milestone of the
-[release plan](release-plan.md#milestones-and-order-of-work).
+[queue migration](queue-migration.md#milestones-and-order-of-work).
 
-## M0 · Contracts
+## M0 · Event contract
 
-- The heartbeat schema has a `guideVersion` field, optional for old agents.
-- `guide.applied` is documented with an example payload:
+- The `order.placed` schema has an `eventId` field, required from day one.
+- Every consumer documents its deduplication key with an example payload:
 
 ```json
-{ "type": "guide.applied", "guide": "grokbot", "version": "2026.10.15" }
+{ "type": "order.placed", "eventId": "01JAB3K9", "orderId": "ord_4821", "total": 129.9 }
 ```
 
-## M3 · GrokBot pilot
+## M2 · Email worker
 
 > [!TIP]
-> Run the release with `--dry-run` first and compare the selected agents with the
-> heartbeat report by hand.
+> Replay yesterday's outbox with `--dry-run` first and compare the emails the worker
+> would send with the ones the API sent by hand.
 
-Success means every selected agent confirms within 48 hours and none of the agents that
-already had the version receives the request.
+Success means every order gets exactly one confirmation email within 2 minutes and the
+dead-letter queue stays empty for a week.

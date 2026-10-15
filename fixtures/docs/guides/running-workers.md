@@ -1,59 +1,67 @@
-# Getting started
+# Running workers
 
-How an agent installs and keeps a guide up to date.
+How a worker consumes the order queue and keeps processing safe to repeat.
 
-![Release flow](../img/flow.svg)
+![Order flow](../img/flow.svg)
 
-## Install
+## Start a worker
 
 ```ts
-import { installGuide } from '@agent-kit/guides'
+import { createConsumer } from './queue/consumer.ts'
 
-await installGuide('grokbot', { version: 'latest' })
+const consumer = createConsumer({ group: 'email', topic: 'order.placed', concurrency: 8 })
+await consumer.run(async (event) => sendConfirmation(event.orderId))
 ```
 
-## Keep it current
+## Make it idempotent
 
-When a release asks for it, the agent inspects its installation, resolves differences
-with the requested guide and verifies the change persisted. See the
-[release plan](../plans/release-plan.md) for how releases select agents.
+The broker may deliver a message more than once. Before running a side effect, the worker
+records the `eventId` in `processed_events`; if the insert conflicts, the message is a
+duplicate and is acknowledged without doing anything. See the
+[queue migration](../architecture/queue-migration.md) for the delivery guarantees.
 
 ### Troubleshooting
 
 > [!CAUTION]
-> Never edit an installed guide by hand: the next release overwrites it.
+> Never delete rows from the outbox by hand: the relay may not have published them yet.
 
-| Symptom              | Likely cause                  |
-| -------------------- | ----------------------------- |
-| No release request   | Agent already on that version |
-| Request every hour   | `guide.applied` never sent    |
+| Symptom                   | Likely cause                         |
+| ------------------------- | ------------------------------------ |
+| Duplicate emails          | `eventId` not recorded before acking |
+| Consumer lag keeps rising | A poison message is being retried    |
 
-## How a release reaches an agent
+## How an order reaches a worker
 
 ```mermaid
 flowchart LR
-  subgraph Synapse["Synapse"]
-    REL["Release command"]
-    HB[("Heartbeat reports")]
+  subgraph API["Orders API"]
+    REQ["POST /orders"]
+    DB[("orders + outbox")]
   end
-  subgraph Agent["OpenClaw gateway"]
-    CTRL["Control account"]
-    CFG[("openclaw.json")]
+  subgraph Async["Async processing"]
+    RELAY["Outbox relay"]
+    BROKER[("Broker")]
+    WORKER["Email worker"]
+    DLQ[("Dead-letter queue")]
   end
-  REL -->|"selects older versions"| HB
-  REL -->|"backchannel request"| CTRL
-  CTRL -->|"guide.applied"| REL
-  CTRL --> CFG
-  classDef gw fill:#fde68a,stroke:#b45309,color:#000;
-  class CTRL gw;
+  REQ -->|"one transaction"| DB
+  RELAY -->|"polls unsent rows"| DB
+  RELAY -->|"publishes order.placed"| BROKER
+  BROKER --> WORKER
+  WORKER -->|"after 5 failures"| DLQ
+  classDef worker fill:#fde68a,stroke:#b45309,color:#000;
+  class WORKER worker;
 ```
 
 ```mermaid
 sequenceDiagram
-  participant S as Synapse
-  participant A as Agent
-  S->>A: Compare guide 2026.10.15 with your setup
-  A-->>S: guide.applied
+  participant B as Broker
+  participant W as Worker
+  participant D as Database
+  B->>W: order.placed (eventId 01JAB3K9)
+  W->>D: insert into processed_events
+  D-->>W: ok
+  W-->>B: ack
 ```
 
 ```mermaid

@@ -1,4 +1,4 @@
-# Plans
+# Architecture
 
-Release planning for guide versioning. Start with the
-[release plan](release-plan.md), then check the [validation plan](validation.md).
+Plans for moving order processing off the request path. Start with the
+[queue migration](queue-migration.md), then check the [rollout checks](rollout-checks.md).

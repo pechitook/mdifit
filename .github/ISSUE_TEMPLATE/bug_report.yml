@@ -1,0 +1,29 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: markdown
+    attributes:
+      label: Markdown to reproduce
+      description: The smallest Markdown that shows the problem, if it is about rendering or comments.
+      render: markdown
+  - type: input
+    id: version
+    attributes:
+      label: mdifit version
+      placeholder: npx mdifit --version
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, Node.js and browser
+      placeholder: macOS 26, Node 24.18, Chrome 141

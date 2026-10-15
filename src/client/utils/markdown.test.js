@@ -116,3 +116,22 @@ describe('slugify', () => {
     expect(slugify('Implementación')).toBe('implementación')
   })
 })
+
+describe('renderMarkdown diagrams', () => {
+  it('keeps the source of top-level mermaid fences, with their lines', () => {
+    const source = '# T\n\n```mermaid\nflowchart LR\n  A --> B\n```\n\n```js\nx\n```'
+    const { blocks } = renderMarkdown(source, 'a.md')
+    expect(blocks.map((b) => [b.startLine, b.endLine, b.diagram])).toEqual([
+      [1, 1, null],
+      [3, 6, 'flowchart LR\n  A --> B\n'],
+      [8, 10, null],
+    ])
+    expect(blocks[1].html).toContain('flowchart LR')
+  })
+
+  it('leaves mermaid inside other blocks as code', () => {
+    const { blocks } = renderMarkdown('- item\n\n  ```mermaid\n  A --> B\n  ```', 'a.md')
+    expect(blocks).toHaveLength(1)
+    expect(blocks[0].diagram).toBeNull()
+  })
+})

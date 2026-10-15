@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Icon from '../../../components/ui/Icon.vue'
 import type { RenderedBlock } from '../../../utils/markdown.ts'
+import DiagramBlock from './DiagramBlock.vue'
 
 defineProps<{ blocks: RenderedBlock[] }>()
 const emit = defineEmits<{ addAt: [block: RenderedBlock] }>()
@@ -27,7 +28,8 @@ const emit = defineEmits<{ addAt: [block: RenderedBlock] }>()
         </button>
         <span class="line">{{ block.startLine }}</span>
       </div>
-      <div class="markdown" data-doc v-html="block.html" />
+      <DiagramBlock v-if="block.diagram !== null" :source="block.diagram" :code-html="block.html" />
+      <div v-else class="markdown" data-doc v-html="block.html" />
       <div class="after">
         <slot name="after" :block="block" />
       </div>

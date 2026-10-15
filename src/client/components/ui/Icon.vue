@@ -16,6 +16,7 @@ export type IconName =
   | 'link'
   | 'arrow-right'
   | 'keyboard'
+  | 'expand'
 
 const PATHS: Record<IconName, string[]> = {
   search: ['M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z', 'M20 20l-3.5-3.5'],
@@ -35,6 +36,7 @@ const PATHS: Record<IconName, string[]> = {
     'M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
   ],
   'arrow-right': ['M5 12h14M13 6l6 6-6 6'],
+  expand: ['M15 3h6v6', 'M9 21H3v-6', 'M21 3l-7 7', 'M3 21l7-7'],
   keyboard: [
     'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
     'M7 10h.01M11 10h.01M15 10h.01M8 14h8',

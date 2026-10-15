@@ -29,6 +29,8 @@ export interface RenderedBlock {
   /** 1-based, inclusive. */
   startLine: number
   endLine: number
+  /** Source of a top-level ```mermaid fence; `html` then holds the code as a fallback. */
+  diagram: string | null
 }
 
 export interface OutlineHeading {
@@ -135,12 +137,20 @@ export function renderMarkdown(source: string, filePath: string): RenderedDoc {
         html: md.renderer.render(group, md.options, env),
         startLine: map[0] + 1,
         endLine: Number(group[0]?.attrGet('data-line-end') ?? map[0] + 1),
+        diagram: diagramSource(group[0]),
       })
     }
     start = index + 1
   })
 
   return { blocks, headings: env.headings }
+}
+
+/** Mermaid fences are drawn by the reader; everything else stays code. */
+export function diagramSource(token: Token | undefined): string | null {
+  if (token?.type !== 'fence') return null
+  const lang = token.info.trim().split(/\s+/)[0]?.toLowerCase()
+  return lang === 'mermaid' ? token.content : null
 }
 
 /**

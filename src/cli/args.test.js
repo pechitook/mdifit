@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_PORT, parseCliArgs } from './args.ts'
+import { parseCliArgs } from './args.ts'
 
 describe('parseCliArgs', () => {
-  it('defaults to the current folder, the fixed port and opening the browser', () => {
+  it('defaults to the current folder, an automatic port and opening the browser', () => {
     expect(parseCliArgs([])).toEqual({
       kind: 'run',
-      options: { target: '.', port: DEFAULT_PORT, open: true },
+      options: { target: '.', port: null, open: true },
     })
   })
 

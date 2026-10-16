@@ -1,14 +1,18 @@
 import { parseArgs } from 'node:util'
 
 /**
- * One fixed port, always. Comments live in the browser's localStorage, which is
- * per origin: a port that moved would make every comment disappear.
+ * The first port tried, then the next ones. Comments live in the browser's
+ * localStorage, which is per origin, so each folder remembers the port it got
+ * (see ports.ts) and comes back to it.
  */
 export const DEFAULT_PORT = 1905
+/** How many ports after DEFAULT_PORT are tried before giving up. */
+export const PORT_SPAN = 20
 
 export interface CliOptions {
   target: string
-  port: number
+  /** A port passed with --port, or `null` to pick one. */
+  port: number | null
   open: boolean
 }
 
@@ -26,8 +30,9 @@ Arguments:
   path            Folder or Markdown file to open (default: current folder)
 
 Options:
-  --port <port>   Port to serve on (default: ${DEFAULT_PORT}). Comments are stored
-                  per port, so keep it stable.
+  --port <port>   Serve on exactly this port. By default each folder gets the
+                  port it used last, else ${DEFAULT_PORT} or the next free one.
+                  Comments are stored per port.
   --no-open       Do not open the browser
   -v, --version   Print the version
   -h, --help      Print this help
@@ -58,8 +63,8 @@ export function parseCliArgs(argv: string[]): ParsedArgs {
     return { kind: 'error', message: `Expected one path, got ${positionals.length}` }
   }
 
-  const port = values.port === undefined ? DEFAULT_PORT : Number(values.port)
-  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+  const port = values.port === undefined ? null : Number(values.port)
+  if (port !== null && (!Number.isInteger(port) || port < 1 || port > 65535)) {
     return { kind: 'error', message: `Invalid port: ${values.port}` }
   }
 

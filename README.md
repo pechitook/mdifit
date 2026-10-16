@@ -24,6 +24,11 @@ npx mdifit docs/
   <img src="docs/images/screenshot-light.png" alt="mdifit showing an architecture plan: a phrase is underlined, a bubble sits in the margin, and the comment is open beside the text">
 </picture>
 
+<p align="center">
+  <a href="https://pechitook.github.io/mdifit/demo.mp4"><strong>Watch the 36-second demo</strong></a>
+  · <a href="https://pechitook.github.io/mdifit/">Website</a>
+</p>
+
 Agents write more and more of their work to disk as Markdown: plans, specs, reports,
 notes. mdifit is the reviewing side of that loop. It renders the folder like a good
 Markdown reader, lets you comment on any line, range or phrase as you read, and turns your

@@ -1,6 +1,6 @@
 {
   "name": "mdifit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Read a folder of Markdown, comment while you read, and copy your review as a prompt for your coding agent.",
   "keywords": [
     "agent",

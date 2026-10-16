@@ -6,11 +6,6 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-### Changed
-
-- ⌘K lists files newest first and shows when each was last modified. With an empty query
-  it shows the most recent files, so new plans and guides are one keystroke away.
-
 ## [0.1.2] - 2026-10-16
 
 ### Changed
@@ -19,6 +14,8 @@ All notable changes to this project are documented here. The format follows
   the first free one, so several folders can be open at once. Each folder remembers its
   port in `~/.config/mdifit/ports.json` and gets it back next time, which keeps its
   comments. `--port` still pins one exact port.
+- ⌘K lists files newest first and shows when each was last modified. With an empty query
+  it shows the most recent files, so new plans and guides are one keystroke away.
 
 ## [0.1.1] - 2026-10-16
 

@@ -6,10 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-16
+
 ### Changed
 
 - The fixed port is now 1905. Comments saved under the old port (47613) stay in that
   origin's storage and do not carry over.
+
+### Fixed
+
+- Margin popovers opened near the bottom of the window scroll into view.
+- ⌘K says "Searching…" while results are on their way instead of "Nothing found".
 
 ## [0.1.0] - 2026-10-15
 

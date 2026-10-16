@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-10-16
+
+### Changed
+
+- mdifit no longer refuses to start when port 1905 is taken: it tries 1905 to 1924 and uses
+  the first free one, so several folders can be open at once. Each folder remembers its
+  port in `~/.config/mdifit/ports.json` and gets it back next time, which keeps its
+  comments. `--port` still pins one exact port.
+
 ## [0.1.1] - 2026-10-16
 
 ### Changed

@@ -80,10 +80,11 @@ npx mdifit PLAN.md         # a single file
 npx mdifit docs --no-open  # do not open the browser
 ```
 
-mdifit serves on `http://localhost:1905`, always the same port. Your comments are stored in
-your browser per port and per folder, so a stable port is what keeps them across restarts.
-Running mdifit again on the same folder reuses the open instance. `--port` exists for
-conflicts, but a different port starts with an empty review.
+mdifit serves on `http://localhost:1905`, or the next free port when another folder is
+already open there. Your comments are stored in your browser per port and per folder, so
+each folder remembers its port and gets it back next time. Running mdifit again on the same
+folder reuses the open instance. `--port 5000` serves on exactly that port; a port the
+folder has not used before starts with an empty review.
 
 Nothing is written to the folder. The server only reads Markdown and images inside it, only
 on `127.0.0.1`, and only for requests addressed to `localhost`. Raw HTML in Markdown is

@@ -16,7 +16,7 @@ Comments live in the browser (localStorage); nothing is written to the folder.
 
 | Folder | What it is | Docs |
 |---|---|---|
-| `src/cli/` | `mdifit` binary: args, fixed port, reuse a running instance, open the browser | [ARCHITECTURE](ARCHITECTURE.md#cli) |
+| `src/cli/` | `mdifit` binary: args, a stable port per folder, reuse a running instance, open the browser | [ARCHITECTURE](ARCHITECTURE.md#cli) |
 | `src/server/` | Hono app: workspace listing, file reads, search, change events, static client | [AGENTS](src/server/AGENTS.md) |
 | `src/client/` | Vue 3 web UI: reader, comments, prompt, palette | [AGENTS](src/client/AGENTS.md) |
 | `src/shared/` | HTTP contract types only (no runtime code) | `api.ts` |
@@ -24,7 +24,7 @@ Comments live in the browser (localStorage); nothing is written to the folder.
 | `fixtures/docs/` | Sample Markdown for `npm run dev` and manual testing | — |
 | `docs/` | Decisions (ADRs) | index below |
 
-Decisions: [comments in localStorage on a fixed port](docs/adr-001-local-storage-fixed-port.md) ·
+Decisions: [comments in localStorage on a stable port](docs/adr-001-local-storage-fixed-port.md) ·
 [raw HTML stays escaped](docs/adr-002-escape-raw-html.md).
 
 ## Commands
@@ -41,7 +41,7 @@ npm run build               # dist/client (Vite) + dist/node (tsc)
 node src/cli/index.ts docs  # run the CLI from source (Node strips the types)
 ```
 
-Ports: CLI `1905` (fixed, see ADR-001) · dev `47614`.
+Ports: CLI `1905` or the next free one, remembered per folder (ADR-001) · dev `47614`.
 
 ## Invariants (never break)
 
@@ -51,7 +51,8 @@ Ports: CLI `1905` (fixed, see ADR-001) · dev `47614`.
 2. **Every client path goes through `resolveInside`** before it reaches the filesystem.
    The server only answers requests whose `Host` is a loopback name.
 3. **Raw HTML in Markdown is escaped**, never rendered (ADR-002).
-4. **The fixed port is the storage key.** Do not make the port dynamic or "find a free one".
+4. **The port is the storage key.** A folder keeps the port it got (`src/cli/ports.ts`);
+   never pick a random port, and never move a folder off its port while that port is free.
 5. **Co-location and JS tests.** Every module has its `*.test.js` next to it, importing the
    `.ts` explicitly. Pure rules live in `*.rules.ts` / `*.helpers.ts`; tests need no DOM,
    no network and no mocks of `fs` (server tests use real temp folders).

@@ -4,7 +4,7 @@ How mdifit is put together, layer by layer. Rules and commands are in
 [AGENTS.md](AGENTS.md); this file explains the why and the flows.
 
 ```
-mdifit [path]                       browser (http://localhost:1905)
+mdifit [path]                       browser (http://localhost:1905…)
 ┌──────────────┐  serve()  ┌──────────────────────────┐  fetch / EventSource  ┌────────────┐
 │ src/cli      │ ────────▶ │ src/server (Hono)         │ ◀──────────────────── │ src/client │
 │ args, port,  │           │ /api/workspace /api/file  │                       │ Vue 3      │
@@ -23,10 +23,14 @@ mdifit [path]                       browser (http://localhost:1905)
 1. `args.ts` parses `[path] [--port] [--no-open] [-v] [-h]` with `node:util` `parseArgs`.
 2. `resolveWorkspace` (server module) turns the path into `{ target, root, only, cwd }`.
    A file becomes single-file mode: its folder is the root and only it is served.
-3. `instance.ts` probes `GET /api/health` on the port; `instance.rules.ts` decides:
+3. Pick the port (ADR-001). `instance.rules.ts` lists the candidates: the port this folder
+   used last (`ports.ts`, kept in `$XDG_CONFIG_HOME/mdifit/ports.json`, else
+   `~/.config/…`), then `1905` to `1924`. For each, `instance.ts` probes `GET /api/health`:
    free → start; mdifit serving the same target → just open the browser; anything else →
-   explain the conflict and exit 1. The port never moves on its own (ADR-001).
-4. `serve()` binds `127.0.0.1` only, prints the banner and opens `http://localhost:<port>`.
+   try the next. With `--port` only that port is tried and a conflict exits 1.
+   A port taken between the probe and the bind counts as taken.
+4. `serve()` binds `127.0.0.1` only, remembers the port for the folder, prints the banner
+   and opens `http://localhost:<port>`.
    Ctrl+C closes the watcher and the event streams.
 
 ## Server

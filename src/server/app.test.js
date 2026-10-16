@@ -18,7 +18,7 @@ async function setup(files, { clientDir = null } = {}) {
   const config = await resolveWorkspace(tree.root, tree.root)
   mdifit = createApp({ config, version: '0.0.0-test', clientDir })
   return (url, init = {}) =>
-    mdifit.app.request(url, { ...init, headers: { host: 'localhost:47613', ...init.headers } })
+    mdifit.app.request(url, { ...init, headers: { host: 'localhost:1905', ...init.headers } })
 }
 
 describe('API', () => {
@@ -68,7 +68,7 @@ describe('API', () => {
 
   it('refuses requests addressed to other hosts', async () => {
     const request = await setup({ 'a.md': '# A' })
-    const res = await request('/api/workspace', { headers: { host: 'evil.example:47613' } })
+    const res = await request('/api/workspace', { headers: { host: 'evil.example:1905' } })
     expect(res.status).toBe(403)
   })
 })

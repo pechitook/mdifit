@@ -41,7 +41,7 @@ npm run build               # dist/client (Vite) + dist/node (tsc)
 node src/cli/index.ts docs  # run the CLI from source (Node strips the types)
 ```
 
-Ports: CLI `47613` (fixed, see ADR-001) · dev `47614`.
+Ports: CLI `1905` (fixed, see ADR-001) · dev `47614`.
 
 ## Invariants (never break)
 

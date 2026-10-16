@@ -9,11 +9,12 @@ state into the folder being reviewed (`.mdifit/comments.json`) dirties repos, ne
 ## Decision
 
 Keep comments and reading progress in the browser's localStorage, keyed by the absolute
-root path (`mdifit:v1:<root>`). Serve on one fixed port, `47613`, every time.
+root path (`mdifit:v1:<root>`). Serve on one fixed port, `1905`, every time.
 
 localStorage is per origin, and the port is part of the origin: a tool that picks "any free
-port" (difit's default) would show an empty review whenever the port changed. `47613` is
-uncommon and below the macOS/Linux ephemeral range, so it is rarely taken. When it is taken
+port" (difit's default) would show an empty review whenever the port changed. `1905`, the
+year Boca Juniors was founded, is uncommon and below the macOS/Linux ephemeral range, so it
+is rarely taken. When it is taken
 by another mdifit for the same folder, the CLI reuses it; otherwise it explains the
 conflict instead of silently moving.
 

@@ -4,7 +4,7 @@ How mdifit is put together, layer by layer. Rules and commands are in
 [AGENTS.md](AGENTS.md); this file explains the why and the flows.
 
 ```
-mdifit [path]                       browser (http://localhost:47613)
+mdifit [path]                       browser (http://localhost:1905)
 ┌──────────────┐  serve()  ┌──────────────────────────┐  fetch / EventSource  ┌────────────┐
 │ src/cli      │ ────────▶ │ src/server (Hono)         │ ◀──────────────────── │ src/client │
 │ args, port,  │           │ /api/workspace /api/file  │                       │ Vue 3      │

@@ -4,7 +4,7 @@ import { parseArgs } from 'node:util'
  * One fixed port, always. Comments live in the browser's localStorage, which is
  * per origin: a port that moved would make every comment disappear.
  */
-export const DEFAULT_PORT = 47613
+export const DEFAULT_PORT = 1905
 
 export interface CliOptions {
   target: string

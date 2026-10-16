@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The fixed port is now 1905. Comments saved under the old port (47613) stay in that
+  origin's storage and do not carry over.
+
+## [0.1.0] - 2026-10-15
+
 ### Added
 
 - `mdifit [folder|file]` serves Markdown on a fixed port (47613) and reuses a running

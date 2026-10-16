@@ -4,7 +4,7 @@
 
 Markdown may contain raw HTML. Rendering it as-is would let any file in the folder (often
 written by an agent, or pulled from someone else's repo) run script on
-`localhost:47613`, read every other file through the API and the review in localStorage.
+`localhost:1905`, read every other file through the API and the review in localStorage.
 
 ## Decision
 

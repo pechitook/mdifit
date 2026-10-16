@@ -7,7 +7,7 @@ import {
   matchFiles,
 } from './CommandPalette.helpers.ts'
 
-const file = (path, title = null) => ({ path, title, mtimeMs: 1, size: 1 })
+const file = (path, title = null, mtimeMs = 1) => ({ path, title, mtimeMs, size: 1 })
 
 describe('fuzzyScore', () => {
   it('matches characters in order and rejects otherwise', () => {
@@ -33,9 +33,27 @@ describe('matchFiles', () => {
       line: null,
       label: 'plans/release.md',
       detail: 'Release plan',
+      mtimeMs: 1,
     })
     const many = Array.from({ length: 20 }, (_, i) => file(`f${i}.md`))
     expect(matchFiles(many, 'f')).toHaveLength(FILE_LIMIT)
+  })
+
+  it('lists every file newest first when the query is empty', () => {
+    const files = [file('old.md', null, 10), file('new.md', null, 30), file('mid.md', null, 20)]
+    expect(matchFiles(files, '').map((item) => item.path)).toEqual(['new.md', 'mid.md', 'old.md'])
+  })
+
+  it('puts newer files first among good matches, and drops loose ones', () => {
+    const files = [
+      file('plans/release-notes.md', null, 10),
+      file('plans/release.md', null, 20),
+      file('research/legacy-archives-e.md', null, 99),
+    ]
+    expect(matchFiles(files, 'release').map((item) => item.path)).toEqual([
+      'plans/release.md',
+      'plans/release-notes.md',
+    ])
   })
 })
 

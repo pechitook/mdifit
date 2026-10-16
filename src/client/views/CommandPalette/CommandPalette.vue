@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import type { WorkspaceFile } from '../../../shared/api.ts'
 import { search } from '../../services/api.ts'
 import Icon from '../../components/ui/Icon.vue'
+import { formatAge } from '../../utils/text.ts'
 import { type PaletteItem, highlightParts, hitItems, matchFiles } from './CommandPalette.helpers.ts'
 
 const props = defineProps<{ open: boolean; files: WorkspaceFile[] }>()
@@ -14,14 +15,16 @@ const query = ref('')
 const remote = ref<PaletteItem[]>([])
 const active = ref(0)
 const searching = ref(false)
+/** Read when the palette opens, so ages do not tick while you look. */
+const now = ref(Date.now())
 
 const items = computed(() => [...matchFiles(props.files, query.value), ...remote.value])
 
-const GROUPS: { kind: PaletteItem['kind']; label: string }[] = [
-  { kind: 'file', label: 'Files' },
+const GROUPS = computed<{ kind: PaletteItem['kind']; label: string }[]>(() => [
+  { kind: 'file', label: query.value.trim() ? 'Files' : 'Recent files' },
   { kind: 'heading', label: 'Headings' },
   { kind: 'text', label: 'Text' },
-]
+])
 
 let controller: AbortController | null = null
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -56,6 +59,7 @@ watch(
     if (open) {
       query.value = ''
       remote.value = []
+      now.value = Date.now()
       dialog.value?.showModal()
       input.value?.focus()
     } else {
@@ -142,13 +146,20 @@ watch(active, (index) => {
               </template>
             </span>
             <span class="detail">{{ item.detail }}</span>
+            <time
+              v-if="item.mtimeMs !== null"
+              class="age"
+              :datetime="new Date(item.mtimeMs).toISOString()"
+              :title="new Date(item.mtimeMs).toLocaleString()"
+              >{{ formatAge(item.mtimeMs, now) }}</time
+            >
           </button>
         </template>
       </template>
       <p v-if="items.length === 0" class="empty">
         {{
           query.trim().length < 2
-            ? 'Type to search every file.'
+            ? 'No Markdown files here.'
             : searching
               ? 'Searching…'
               : 'Nothing found.'
@@ -243,6 +254,15 @@ watch(active, (index) => {
   color: var(--text-muted);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.age {
+  flex: none;
+  min-width: 64px;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .empty {

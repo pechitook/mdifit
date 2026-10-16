@@ -3,7 +3,8 @@ import { normalize } from '../../utils/text.ts'
 
 /**
  * ⌘K: files match locally as you type; headings and text come from the
- * server. Results keep that order: files, headings, text.
+ * server. Results keep that order: files, headings, text. Files are listed
+ * newest first, so recent plans and guides surface without a query.
  */
 
 export type PaletteKind = 'file' | 'heading' | 'text'
@@ -16,9 +17,17 @@ export interface PaletteItem {
   line: number | null
   label: string
   detail: string
+  /** Last modified, for files; `null` for headings and text. */
+  mtimeMs: number | null
 }
 
 export const FILE_LIMIT = 8
+/**
+ * A file must score at least this share of the best match to be listed. Above
+ * it, newer files go first; below it, a loose subsequence would bury the file
+ * you meant under whatever changed last.
+ */
+export const RELEVANCE = 0.7
 
 /**
  * Subsequence score: every query character must appear in order. Consecutive
@@ -46,11 +55,15 @@ export function fuzzyScore(query: string, target: string): number | null {
   return score - t.length / 100
 }
 
+/** Files matching the query (all of them for an empty one), newest first. */
 export function matchFiles(files: WorkspaceFile[], query: string): PaletteItem[] {
-  return files
-    .map((file) => ({ file, score: fuzzyScore(query, `${file.path}`) }))
+  const scored = files
+    .map((file) => ({ file, score: fuzzyScore(query, file.path) }))
     .filter((entry): entry is { file: WorkspaceFile; score: number } => entry.score !== null)
-    .toSorted((a, b) => b.score - a.score)
+  const best = Math.max(0, ...scored.map((entry) => entry.score))
+  return scored
+    .filter((entry) => entry.score >= best * RELEVANCE)
+    .toSorted((a, b) => b.file.mtimeMs - a.file.mtimeMs || b.score - a.score)
     .slice(0, FILE_LIMIT)
     .map(({ file }) => ({
       key: `file:${file.path}`,
@@ -59,6 +72,7 @@ export function matchFiles(files: WorkspaceFile[], query: string): PaletteItem[]
       line: null,
       label: file.path,
       detail: file.title ?? '',
+      mtimeMs: file.mtimeMs,
     }))
 }
 
@@ -70,6 +84,7 @@ export function hitItems(hits: SearchHit[]): PaletteItem[] {
     line: hit.line,
     label: hit.kind === 'heading' ? `${'#'.repeat(hit.level ?? 1)} ${hit.text}` : hit.text,
     detail: `${hit.path}:L${hit.line}`,
+    mtimeMs: null,
   }))
 }
 

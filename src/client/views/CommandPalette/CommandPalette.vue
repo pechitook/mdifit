@@ -32,17 +32,20 @@ watch(query, (value) => {
   controller?.abort()
   if (value.trim().length < 2) {
     remote.value = []
+    searching.value = false
     return
   }
+  // Pending from the first keystroke, so the list never says "Nothing found" too early.
+  searching.value = true
   timer = setTimeout(async () => {
-    controller = new AbortController()
-    searching.value = true
+    const current = new AbortController()
+    controller = current
     try {
-      remote.value = hitItems((await search(value, controller.signal)).hits)
+      remote.value = hitItems((await search(value, current.signal)).hits)
     } catch {
       // Aborted by the next keystroke, or the server went away: keep file results.
     } finally {
-      searching.value = false
+      if (controller === current && !current.signal.aborted) searching.value = false
     }
   }, 120)
 })

@@ -34,6 +34,8 @@
   --mark-active: #f5f0e3;
   --pending: #e6edfb;
   --suggest-line: #93bba0;
+  --brand-accent: #cdbf9a;
+  --progress: var(--suggest);
 
   --suggest: #2f7d4f;
   --suggest-bg: #ddf0e3;
@@ -113,5 +115,26 @@
 
     --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.5);
     --shadow-card: 0 4px 14px rgb(0 0 0 / 0.3);
+  }
+}
+
+/* Azul y oro: typing `boca` outside a text field toggles it (utils/secretWord.ts). */
+
+:root[data-boca] {
+  --boca-blue: #0b3a82;
+  --boca-gold: #fcb813;
+  --mark-line: #e8a800;
+  --mark-active: #fff3cc;
+  --brand-accent: #fcb813;
+  --progress: #fcb813;
+  --selection: #ffe7a3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-boca] {
+    --boca-blue: #2f6fd6;
+    --mark-line: #fcb813;
+    --mark-active: #3a2f08;
+    --selection: #5a4810;
   }
 }

@@ -14,6 +14,7 @@ import { countByPath, readStatus } from './stores/review.helpers.ts'
 import { copyText, isEditingTarget } from './utils/dom.ts'
 import { renderMarkdown } from './utils/markdown.ts'
 import { type Route, folderOf, formatHash, isFolderPath, parseHash } from './utils/route.ts'
+import { NO_SECRET, typeSecret } from './utils/secretWord.ts'
 import { matchShortcut } from './utils/shortcuts.ts'
 import { pluralize } from './utils/text.ts'
 import type { PaletteItem } from './views/CommandPalette/CommandPalette.helpers.ts'
@@ -98,6 +99,11 @@ const nextPath = computed(() =>
 )
 
 watch(prefs, savePrefs, { deep: true })
+watch(
+  () => prefs.value.boca,
+  (on) => document.documentElement.toggleAttribute('data-boca', on),
+  { immediate: true },
+)
 
 // --- loading -----------------------------------------------------------------
 
@@ -211,13 +217,31 @@ function showToast(message: string): void {
 
 // --- keyboard ----------------------------------------------------------------
 
+let secret = NO_SECRET
+
+/** Typing `boca` toggles the azul y oro theme. Returns true when the key belonged to it. */
+function onSecretKey(event: KeyboardEvent, editing: boolean): boolean {
+  if (editing || dialog.value || event.metaKey || event.ctrlKey || event.altKey) return false
+  const step = typeSecret(secret, event.key, Date.now())
+  secret = step.state
+  if (step.undoFirst && !workspace.value?.single) prefs.value.showFiles = !prefs.value.showFiles
+  if (step.matched) {
+    prefs.value.boca = !prefs.value.boca
+    showToast(prefs.value.boca ? 'Azul y oro. Dale Boca.' : 'Azul y oro, en pausa.')
+  }
+  if (step.consumed) event.preventDefault()
+  return step.consumed
+}
+
 function onKeydown(event: KeyboardEvent): void {
+  const editing = isEditingTarget(event.target)
+  if (onSecretKey(event, editing)) return
   const action = matchShortcut({
     key: event.key,
     metaKey: event.metaKey,
     ctrlKey: event.ctrlKey,
     altKey: event.altKey,
-    editing: isEditingTarget(event.target),
+    editing,
   })
   if (!action) return
   if (dialog.value && action !== 'palette') return

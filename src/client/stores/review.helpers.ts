@@ -37,6 +37,8 @@ export interface Prefs {
   showFiles: boolean
   /** Comments rail on the right. */
   showComments: boolean
+  /** Azul y oro theme, toggled by typing `boca` (an easter egg). */
+  boca: boolean
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -44,6 +46,7 @@ export const DEFAULT_PREFS: Prefs = {
   includeQuotes: true,
   showFiles: true,
   showComments: true,
+  boca: false,
 }
 
 /** Stored preferences, falling back to the default for anything missing or malformed. */
@@ -54,13 +57,14 @@ export function parsePrefs(raw: string | null): Prefs {
   } catch {
     // Keep the defaults.
   }
-  const flag = (key: 'includeQuotes' | 'showFiles' | 'showComments') =>
+  const flag = (key: 'includeQuotes' | 'showFiles' | 'showComments' | 'boca') =>
     typeof data[key] === 'boolean' ? data[key] : DEFAULT_PREFS[key]
   return {
     mode: data.mode === 'source' ? 'source' : 'read',
     includeQuotes: flag('includeQuotes'),
     showFiles: flag('showFiles'),
     showComments: flag('showComments'),
+    boca: flag('boca'),
   }
 }
 

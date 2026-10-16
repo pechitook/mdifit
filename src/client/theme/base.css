@@ -275,3 +275,38 @@ dialog::backdrop {
 .flash {
   animation: flash 1.6s ease-out;
 }
+
+/* Azul y oro (see tokens.css): a blue and gold band under the top bar, and the bubbles. */
+
+:root[data-boca] .topbar {
+  position: relative;
+}
+
+:root[data-boca] .topbar::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  left: 0;
+  z-index: 5;
+  height: 6px;
+  background: linear-gradient(
+    var(--boca-blue) 0 2px,
+    var(--boca-gold) 2px 4px,
+    var(--boca-blue) 4px 6px
+  );
+  pointer-events: none;
+}
+
+:root[data-boca] .bubble {
+  border-color: var(--boca-blue);
+  background: var(--boca-blue);
+  color: var(--boca-gold);
+}
+
+:root[data-boca] .bubble.active,
+:root[data-boca] .bubble:hover {
+  border-color: var(--boca-gold);
+  background: var(--boca-gold);
+  color: #0b3a82;
+}

@@ -42,4 +42,7 @@ A component used by two views moves to `components/ui/`. Nothing goes there in a
    bubbles; composers are popovers. Line numbers belong to the Source view and the prompt.
 6. Single-key shortcuts never fire while typing; the key map lives in `utils/shortcuts.ts`
    so the help dialog and the handler agree.
-7. Accessible as built: real buttons and links, labels on inputs, `aria-label` on icon buttons.
+7. Typing `boca` outside a text field toggles an azul y oro theme (`prefs.boca`,
+   `utils/secretWord.ts`, overrides at the end of `tokens.css`). It is an easter egg on
+   purpose: keep it out of the shortcuts dialog and the docs for users.
+8. Accessible as built: real buttons and links, labels on inputs, `aria-label` on icon buttons.

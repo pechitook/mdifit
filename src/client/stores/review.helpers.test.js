@@ -93,13 +93,21 @@ describe('parsePrefs', () => {
       includeQuotes: true,
       showFiles: true,
       showComments: true,
+      boca: false,
     })
   })
 
   it('keeps valid stored values and drops the rest', () => {
     expect(
       parsePrefs(JSON.stringify({ mode: 'source', showFiles: false, showComments: 'no' })),
-    ).toEqual({ mode: 'source', includeQuotes: true, showFiles: false, showComments: true })
+    ).toEqual({
+      mode: 'source',
+      includeQuotes: true,
+      showFiles: false,
+      showComments: true,
+      boca: false,
+    })
+    expect(parsePrefs(JSON.stringify({ boca: true })).boca).toBe(true)
     expect(parsePrefs('not json').showFiles).toBe(true)
     expect(parsePrefs('null').mode).toBe('read')
   })

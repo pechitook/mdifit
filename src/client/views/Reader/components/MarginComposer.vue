@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { type Draft, type DraftMode, type PopoverPlacement, linesLabel } from '../Reader.helpers.ts'
 
 /**
  * The comment composer as a small popover next to the text. The draft is the
  * reader's live model: fields are edited in place, the reader saves it.
  */
-defineProps<{ draft: Draft; placement: PopoverPlacement }>()
+const props = defineProps<{ draft: Draft; placement: PopoverPlacement }>()
 const emit = defineEmits<{ switchMode: [mode: DraftMode]; save: []; cancel: [] }>()
 
+const root = ref<HTMLFormElement | null>(null)
 const field = ref<HTMLTextAreaElement | null>(null)
 
 onMounted(async () => {
   await nextTick()
   field.value?.focus({ preventScroll: true })
 })
+
+// A composer opened near the bottom edge would be cut off: bring it into view.
+watch(
+  () => props.placement,
+  () => root.value?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
+  { flush: 'post', immediate: true },
+)
 
 function onKeydown(event: KeyboardEvent): void {
   if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
@@ -35,6 +43,7 @@ async function setMode(mode: DraftMode): Promise<void> {
 
 <template>
   <form
+    ref="root"
     class="margin-pop"
     :class="placement.side"
     :style="{ top: `${placement.top}px`, left: `${placement.left}px` }"

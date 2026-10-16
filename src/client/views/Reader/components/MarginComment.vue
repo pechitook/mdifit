@@ -1,17 +1,33 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import Icon from '../../../components/ui/Icon.vue'
 import type { ReviewComment } from '../../../stores/review.helpers.ts'
 import { formatAge } from '../../../utils/text.ts'
 import { type PopoverPlacement, linesLabel } from '../Reader.helpers.ts'
 
 /** A saved comment, opened from its bubble. Previous / next walk the file's comments. */
-defineProps<{ comment: ReviewComment; placement: PopoverPlacement; index: number; total: number }>()
+const props = defineProps<{
+  comment: ReviewComment
+  placement: PopoverPlacement
+  index: number
+  total: number
+}>()
 const emit = defineEmits<{ previous: []; next: []; copy: []; edit: []; remove: [] }>()
+
+const root = ref<HTMLElement | null>(null)
+
+// Keep the opened comment on screen, also when it opens under a line near the bottom.
+watch(
+  () => props.placement,
+  () => root.value?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }),
+  { flush: 'post', immediate: true },
+)
 </script>
 
 <template>
   <section
     :id="`comment-${comment.id}`"
+    ref="root"
     class="margin-pop"
     :class="placement.side"
     :style="{ top: `${placement.top}px`, left: `${placement.left}px` }"
